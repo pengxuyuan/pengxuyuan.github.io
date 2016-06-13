@@ -5,84 +5,135 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 12 Jun 2016 13:56:52 +0800</pubDate>
-    <lastBuildDate>Sun, 12 Jun 2016 13:56:52 +0800</lastBuildDate>
+    <pubDate>Mon, 13 Jun 2016 10:47:23 +0800</pubDate>
+    <lastBuildDate>Mon, 13 Jun 2016 10:47:23 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>Hello World - Vno</title>
-        <description>&lt;h4&gt;What&amp;#39;s this&lt;/h4&gt;
+        <title>关于团队开发的编码规范</title>
+        <description>&lt;p&gt;以下是均是个人看法，不喜勿喷，欢迎大家一起多多交流，共同进步。&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://github.com/onevcat/vno-jekyll&quot;&gt;Vno Jekyll&lt;/a&gt; is a theme for &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll&lt;/a&gt;. It is a port of my Ghost theme &lt;a href=&quot;https://github.com/onevcat/vno&quot;&gt;vno&lt;/a&gt;, which is originally developed from &lt;a href=&quot;https://github.com/daleanthony/uno&quot;&gt;Dale Anthony&amp;#39;s Uno&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;对于编码，每个人都有自己的习惯 ，但是我觉得要开发出优质代码的话有些规范还是要统一，毕竟你不是一个人做开发，你要考虑到团队协作以及后续人员维护你的项目，你想一下，让你维护一个别人的项目，上来就是ViewController几千行，所有页面逻辑全部在控制器里面，各种不能见名思义的变量属性，瞬间有种想死的感觉有木有😂😂😂所以吧，还是不要任性开发。&lt;/p&gt;
 
-&lt;h4&gt;Usage&lt;/h4&gt;
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;$ git clone https://github.com/onevcat/vno-jekyll.git your_site
-$ cd your_site
-$ bundler install
-$ bundler exec jekyll serve
-&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-&lt;p&gt;Your site with &lt;code&gt;Vno Jekyll&lt;/code&gt; enabled should be accessible in &lt;a href=&quot;http://127.0.0.1:4000&quot;&gt;http://127.0.0.1:4000&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;说是对于团队开发的编码规范，其实在个人独立开发的时候也需要注意编码的问题，网上面有很多大神写的关于编码的blog，我就不复述了...&lt;/p&gt;
 
-&lt;p&gt;For more information about Jekyll, please visit &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll&amp;#39;s site&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;这里我就写写最近在团队发开种遇到的问题吧，写的不全，后期遇到的其他问题都会贴上来的，一是提醒自己在编码过程中要规范，二是让大家看看我有什么地方理解错了，及时改正，三是，额，三是我写动手写点东西了，好久没写了....&lt;/p&gt;
 
-&lt;h4&gt;Configuration&lt;/h4&gt;
+&lt;p&gt;好了，入正题吧 不然又......&lt;/p&gt;
 
-&lt;p&gt;All configuration could be done in &lt;code&gt;_config.yml&lt;/code&gt;. Remember you need to restart to serve the page when after changing the config file. Everything in the config file should be self-explanatory.&lt;/p&gt;
+&lt;h5&gt;1.你要了解点MVC 最少你要知道我们还有View 跟 Model吧&lt;/h5&gt;
 
-&lt;h4&gt;Background image and avatar&lt;/h4&gt;
+&lt;p&gt;哥哥，真的不要给我控制器里面写个几千行，我实在是维护不了，不要说维护了，估计在看懂你的逻辑之前我都已经挂了...&lt;/p&gt;
 
-&lt;p&gt;You could replace the background and avatar image in &lt;code&gt;assets/images&lt;/code&gt; folder to change them.&lt;/p&gt;
+&lt;p&gt;现在项目开发中，最常用的就是MVC了，然后就是MVVM（我就只会这两个）有这两个开发一般般的项目我觉得够用了。控制器是拿来连接View跟Model的 扮演个协调者的角色 并不是要你把所有的逻辑写在里面。&lt;/p&gt;
 
-&lt;h4&gt;Sites using Vno&lt;/h4&gt;
+&lt;h5&gt;2.我们先谈谈ViewController里面的一些东西&lt;/h5&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://onevcat.com&quot;&gt;My blog&lt;/a&gt; is using &lt;code&gt;Vno Jekyll&lt;/code&gt; as well, you could see how it works in real. There are some other sites using the same theme. You can find them below:&lt;/p&gt;
+&lt;p&gt;首先，不要把所有的属性变量放在.h文件里面。.h文件是暴露出去的，所以越简洁越好，坚持最少原则，用最少最简单的方式完成功能，你放在.h别人用的时候就可以随意操作你的暴露出去的东西了额，还有，我没搞懂为什么在.m文件里面实现的代理，声明要放在.h 比如说这个不要放在.h吧 实在是不好看，也没什么用。&lt;/p&gt;
 
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Site Name&lt;/th&gt;
-&lt;th&gt;URL&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;OneV&amp;#39;s Den&lt;/td&gt;
-&lt;td&gt;&lt;a href=&quot;http://onevcat.com&quot;&gt;http://onevcat.com&lt;/a&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt;还有如果想更好点的话，在.h尽可能的用@class 这样子编译的压力小点 逼格也高点&lt;/p&gt;
+
+&lt;p&gt;对于声明变量属性的话，到底是下面&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;If you happen to be using this theme, welcome to &lt;a href=&quot;https://github.com/onevcat/vno-jekyll/pulls&quot;&gt;send me a pull request&lt;/a&gt; to add your site link here. :)&lt;/p&gt;
+&lt;p&gt;｛
+ UITableview  *tableview；
+｝&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;h4&gt;License&lt;/h4&gt;
+&lt;p&gt;还是&lt;/p&gt;
 
-&lt;p&gt;Great thanks to &lt;a href=&quot;https://github.com/daleanthony&quot;&gt;Dale Anthony&lt;/a&gt; and his &lt;a href=&quot;https://github.com/daleanthony/uno&quot;&gt;Uno&lt;/a&gt;. Vno Jekyll is based on Uno, and contains a lot of modification on page layout, animation, font and some more things I can not remember. Vno Jekyll is followed with Uno and be licensed as &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot;&gt;Creative Commons Attribution 4.0 International&lt;/a&gt;. See the link for more information.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;@property (nonatomic,strong) UITableView *tableview;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;哪个好呢，其实都还好，看个人，我比较喜欢下面那种，可以自动生成get set方法 用懒加载的时候也很是方便啊&lt;/p&gt;
+
+&lt;p&gt;然后在使用的时候，也要注意下 不要一时用 _tableview 一时用self.tableview 一开始我是分别用的，后来看书看到，_tableview 跟self-&amp;gt;tableview 是直接访问地址的，self.tableview是通过消息机制调用get方法，所以呢，_tableview获取的比self. tableview快，所以折中的方法是，在内部读取数据时候尽量用_tableView，设置属性值时候，用self.tableview，这样子你可以通过重写set方法 更加可控 可调试点。&lt;/p&gt;
+
+&lt;h5&gt;关于命名&lt;/h5&gt;
+
+&lt;p&gt;额，命名这个东西老生常谈了，个人坚持的是，宁愿长也不要难认识。&lt;/p&gt;
+
+&lt;h5&gt;函数摆放&lt;/h5&gt;
+
+&lt;p&gt;个人有强迫症，所以比较会注意。&lt;/p&gt;
+
+&lt;p&gt;比如生命周期函数写在一块 懒加载一块 网络请求一块 代理一块 事件一块&lt;/p&gt;
+
+&lt;p&gt;用个#pragma mark - - 瞬间整个世界都有序了 有木有！！！&lt;/p&gt;
+
+&lt;h5&gt;关于注释&lt;/h5&gt;
+
+&lt;p&gt;说到这里，再说下关于注释这东西。通常说法是：程序员最讨厌别人不写注释和自己写注释。&lt;/p&gt;
+
+&lt;p&gt;其实个人我是坚持代码即注释，就是比较讨厌注释的，觉得好的代码不需要注释。&lt;/p&gt;
+
+&lt;p&gt;我总感觉注释很脏啊- -  总感觉多了点什么。（个人强迫症原因....）&lt;/p&gt;
+
+&lt;p&gt;吐槽下，接手的项目全部是注释，关键是注释都没什么用啊.....&lt;/p&gt;
+
+&lt;p&gt;生命周期函数全部写一次注释，这些不写 新生都知道是干嘛的啊- -&lt;/p&gt;
+
+&lt;p&gt;关键是.m文件你的注释为什么要写成这样子呢？&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;/**
+*
+*初始化方法
+*@return self
+*/&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;每个生命周期都是这样子，是真的烦，反正看到的我都删除了。&lt;/p&gt;
+
+&lt;h5&gt;3.关于View&lt;/h5&gt;
+
+&lt;p&gt;个人观点：凡事复杂点的组件（你在屏幕上看到的东西） 都自己写个view出来 不要在ViewController里面写你View里面的布局逻辑，这样子控制器本来不胖的都被你搞胖了😂😂😂&lt;/p&gt;
+
+&lt;p&gt;额，还有，发现很多人虽然写了View 但是 但是 他把View的控件属性全部写在.h里面 然后在ViewController里面直接赋值，这样子还真没搞懂你的View到底是干嘛的 也不能只写布局啊。自己的东西自己管啊，View.h 暴露个Model，ViewController传个Model就好了啊 再不济你传个字典也比在ViewController直接赋值的好啊。&lt;/p&gt;
+
+&lt;p&gt;最后就是：自己的事情自己做&lt;/p&gt;
+
+&lt;p&gt;而还有，不要滥用自定义View 我最近看到一种写法是 View嵌入View然后再嵌入View再嵌入View....太恶心了&lt;/p&gt;
+
+&lt;p&gt;更甚的是，全部写在.h中 设置属性的就是在控制器self.view.view.view.text 然后增加事件就是 self.view.view.view addTag&lt;/p&gt;
+
+&lt;p&gt;看到这个我心中无数只草泥马啊。。。&lt;/p&gt;
+
+&lt;p&gt;善用代理跟block 这样子代码好看还解藕了，多好。&lt;/p&gt;
+
+&lt;p&gt;最近还看到一种用协议来创建自定义View的 是真的厉害 高内聚 代码一下子就可以看懂了 而且逼格一下子就上去了。&lt;/p&gt;
+
+&lt;p&gt;网址：&lt;a href=&quot;http://reviewcode.cn/article.html?reviewId=5&quot;&gt;自定义UI控件&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5&gt;其他&lt;/h5&gt;
+
+&lt;p&gt;额 说到逼格  最近学到 定义常量少用&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;#define&lt;/p&gt;
+
+&lt;p&gt;用static const CGFloat kBorderMargin = 15;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这样子会比较好，可以预先知道类型，减少出错的机会。&lt;/p&gt;
+
+&lt;h5&gt;4.现在的文件命名还不错，都是峰驼式的。&lt;/h5&gt;
+
+&lt;h5&gt;5.封装思想，重用组件。&lt;/h5&gt;
+
+&lt;p&gt;编码的时候做个懒人。&lt;/p&gt;
+
+&lt;p&gt;不要重复的写一样的代码，还不好改。具体的，也不好写，思想大概就是多处用到的一样的东西，抽出来，不要copy代码。&lt;/p&gt;
+
+&lt;h5&gt;The End&lt;/h5&gt;
+
+&lt;p&gt;这篇文章就是拿来练习下markdown的，刚学。&lt;/p&gt;
 </description>
-        <pubDate>Tue, 16 Feb 2016 14:32:24 +0800</pubDate>
-        <link>http://pengxuyuan.github.io/2016/02/hello-world-vno/</link>
-        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/02/hello-world-vno/</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Sample Post</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;def print_hi(name)
-  puts &amp;quot;Hi, #{name}&amp;quot;
-end
-print_hi(&amp;#39;Tom&amp;#39;)
-#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
-</description>
-        <pubDate>Mon, 15 Feb 2016 14:32:24 +0800</pubDate>
-        <link>http://pengxuyuan.github.io/2016/02/sample-post/</link>
-        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/02/sample-post/</guid>
+        <pubDate>Mon, 13 Jun 2016 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2016/06/CodingStandardsForTeamDevelopment/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/06/CodingStandardsForTeamDevelopment/</guid>
         
         
       </item>
