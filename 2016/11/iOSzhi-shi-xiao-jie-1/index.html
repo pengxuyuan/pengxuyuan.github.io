@@ -6,17 +6,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>iOS单例模式</title>
-  <meta name="description" content="单例 保证一个对象只实例化一次 全局使用的都是同一个对象">
+  <title>iOS知识小结（一）</title>
+  <meta name="description" content="iOS知识小结（一）">
   <meta name="author" content="Wei Wang">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="iOS单例模式">
-  <meta name="twitter:description" content="单例 保证一个对象只实例化一次 全局使用的都是同一个对象">
+  <meta name="twitter:title" content="iOS知识小结（一）">
+  <meta name="twitter:description" content="iOS知识小结（一）">
 
   <meta property="og:type" content="article">
-  <meta property="og:title" content="iOS单例模式">
-  <meta property="og:description" content="单例 保证一个对象只实例化一次 全局使用的都是同一个对象">
+  <meta property="og:title" content="iOS知识小结（一）">
+  <meta property="og:description" content="iOS知识小结（一）">
 
   <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
   <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
-  <link rel="canonical" href="http://pengxuyuan.github.io/2016/07/iOS_SigleCase/">
+  <link rel="canonical" href="http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/">
   <link rel="alternate" type="application/rss+xml" title="彭序猿" href="http://pengxuyuan.github.io/feed.xml">
 
   <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
@@ -125,81 +125,14 @@
             <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
     <div class="post-meta">
-      <time datetime="2016-07-28 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2016-07-28</time> &#8226; <span class="post-meta__tags tags"></span>
+      <time datetime="2016-11-09 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2016-11-09</time> &#8226; <span class="post-meta__tags tags"></span>
       <span class="post-meta__date date">浏览量：<span data-hk-page="current"> - </span> 次<span class="post-meta__date date"></span></span>
     </div>
-    <h1 class="post-title">iOS单例模式</h1>
+    <h1 class="post-title">iOS知识小结（一）</h1>
   </header>
 
   <section class="post">
-    <p>单例 保证一个对象只实例化一次 全局使用的都是同一个对象</p>
-
-<ul>
-<li>一是某个类只能有一个实例；</li>
-<li>二是它必须自行创建这个实例；</li>
-<li>三是它必须自行向整个系统提供这个实例。</li>
-</ul>
-
-<p>第一种写法：
-<pre> +(instancetype)shareInstance{<br>
-static PXYGuidePageHelper *instance;<br>
-        @synchronized(self) {<br>
-            if (instance == nil) {<br>
-                instance = [PXYGuidePageHelper new];<br>
-            }<br>
-        }<br>
-    return instance;<br>
-}<br>
-</pre></p>
-
-<p>第二种写法：
-<pre> +(instancetype)shareInstance{
-    static dispatch_once_t onceToken;
-    static PXYGuidePageHelper *instance;
-    dispatch_once(&amp;onceToken, <sup>{</sup>
-        instance = [PXYGuidePageHelper new];
-    });
-    return instance;
-}
-</pre></p>
-
-<p>首先说下第一种写法：
-单例实例是全局使用的，因此要要定义成全局变量 用static修饰 static介绍
-@synchronized这个指令是解决多个线程同时执行同一个代码块 ，@synchronized相当于给这个代码块加锁（防止死锁）
-这里判断当前对象时候存在，不存在创建，存在则返回该对象。</p>
-
-<p>第二种写法：
-dispatch_once这个就是保证只执行一次 所以这里确保 该实例只创建一次</p>
-
-<p>两者区别：
-第一种在每次执行shareInstance方法是都会加一次锁，然后在代码块里面判断 if (instance == nil) 这个来决定是否实例化，这里每次都会有开销。</p>
-
-<blockquote>
-<p>“实际上，如果你去看这个函数所在的头文件，你会发现目前它的实现其实是一个宏，进行了内联的初始化测试，这意味着通常情况下，你不用付出函数调用的负载代价，并且会有更少的同步控制负载。”</p>
-</blockquote>
-
-<p>这样子分析的GCD创建单例更加优雅点。</p>
-
-<p>－－－－<br>
-第一种相当于是 懒汉式单例类 双检锁写法</p>
-
-<p>对于第一种的每次都要加锁的写法，可以使用双检锁写法来提高效率。
-<pre>+(instancetype)shareInstance{
-    static PXYGuidePageHelper *instance;
-    if (instance == nil) {
-        @synchronized(self) {
-            if (instance == nil) {
-                instance = [PXYGuidePageHelper new];
-            }
-        }
-    }
-    return instance;
-}</pre></p>
-
-<p>这样子就能保证只有在第一次进行加锁开销。</p>
-
-<p>还有一种 饿汉式单例
-是在程序一启动就实例化 +(void)load函数里面实现，然后在allocWithZone进行加锁判空操作，这样子无论你是否用特定的方法获取实例，都会返回同一个对象。</p>
+    <p>iOS知识小结（一）</p>
 
 <p>以上</p>
 
@@ -209,28 +142,20 @@ dispatch_once这个就是保证只执行一次 所以这里确保 该实例只�
 <section class="read-more">
    
    
-   <div class="read-more-item">
-       <span class="read-more-item-dim">最近的文章</span>
-       <h2 class="post-list__post-title post-title"><a href="/2016/11/iOSzhi-shi-xiao-jie-1/" title="link to iOS知识小结（一）">iOS知识小结（一）</a></h2>
-       <p class="excerpt">iOS知识小结（一）以上&hellip;</p>
-       <div class="post-list__meta"><time datetime="2016-11-09 00:00:00 +0800" class="post-list__meta--date date">2016-11-09</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/11/iOSzhi-shi-xiao-jie-1/>继续阅读</a></div>
-   </div>
-   
-   
    
    
    <div class="read-more-item">
        <span class="read-more-item-dim">更早的文章</span>
-       <h2 class="post-list__post-title post-title"><a href="/2016/06/CodingStandardsForTeamDevelopment/" title="link to 关于团队开发的编码规范">关于团队开发的编码规范</a></h2>
-       <p class="excerpt">以下是均是个人看法，不喜勿喷，欢迎大家一起多多交流，共同进步。对于编码，每个人都有自己的习惯 ，但是我觉得要开发出优质代码的话有些规范还是要统一，毕竟你不是一个人做开发，你要考虑到团队协作以及后续人员维护你的项目，你想一下，让你维护一个别人的项目，上来就是ViewController几千行，所有页面逻辑全部在控制器里面，各种不能见名思义的变量属性，瞬间有种想死的感觉有木有😂😂😂所以吧，还是不要任性开发。说是对于团队开发的编码规范，其实在个人独立开发的时候也需要注意编码的问题，网上面有很多大...&hellip;</p>
-       <div class="post-list__meta"><time datetime="2016-06-13 00:00:00 +0800" class="post-list__meta--date date">2016-06-13</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/06/CodingStandardsForTeamDevelopment/>继续阅读</a></div>
+       <h2 class="post-list__post-title post-title"><a href="/2016/07/iOS_SigleCase/" title="link to iOS单例模式">iOS单例模式</a></h2>
+       <p class="excerpt">单例 保证一个对象只实例化一次 全局使用的都是同一个对象一是某个类只能有一个实例；二是它必须自行创建这个实例；三是它必须自行向整个系统提供这个实例。第一种写法： +(instancetype)shareInstance{static PXYGuidePageHelper *instance;        @synchronized(self) {            if (instance == nil) {                instance = [PXYGuidePa...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2016-07-28 00:00:00 +0800" class="post-list__meta--date date">2016-07-28</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/07/iOS_SigleCase/>继续阅读</a></div>
    </div>
    
 </section>
 
 <section class="post-comments">
   
-    <div class="ds-thread" data-thread-key="/2016/07/iOS_SigleCase/" data-title="iOS单例模式" data-url="http://pengxuyuan.github.io/2016/07/iOS_SigleCase/"></div>
+    <div class="ds-thread" data-thread-key="/2016/11/iOSzhi-shi-xiao-jie-1/" data-title="iOS知识小结（一）" data-url="http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/"></div>
     <script type="text/javascript">
         var duoshuoQuery = {short_name:"pengxuyuan"};
         (function() {

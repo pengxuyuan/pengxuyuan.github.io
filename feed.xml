@@ -5,12 +5,25 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 28 Jul 2016 11:23:59 +0800</pubDate>
-    <lastBuildDate>Thu, 28 Jul 2016 11:23:59 +0800</lastBuildDate>
+    <pubDate>Wed, 09 Nov 2016 22:49:57 +0800</pubDate>
+    <lastBuildDate>Wed, 09 Nov 2016 22:49:57 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>ios单例模式</title>
+        <title>iOS知识小结（一）</title>
+        <description>&lt;p&gt;iOS知识小结（一）&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+        <pubDate>Wed, 09 Nov 2016 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>iOS单例模式</title>
         <description>&lt;p&gt;单例 保证一个对象只实例化一次 全局使用的都是同一个对象&lt;/p&gt;
 
 &lt;ul&gt;
