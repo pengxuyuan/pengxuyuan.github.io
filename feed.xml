@@ -5,19 +5,123 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 09 Nov 2016 22:49:57 +0800</pubDate>
-    <lastBuildDate>Wed, 09 Nov 2016 22:49:57 +0800</lastBuildDate>
+    <pubDate>Thu, 17 Nov 2016 01:16:07 +0800</pubDate>
+    <lastBuildDate>Thu, 17 Nov 2016 01:16:07 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>iOS知识小结（一）</title>
-        <description>&lt;p&gt;iOS知识小结（一）&lt;/p&gt;
+        <title>Effective Objective-C 2.0 总结（一）</title>
+        <description>&lt;h2&gt;前言&lt;/h2&gt;
 
-&lt;p&gt;以上&lt;/p&gt;
+&lt;p&gt;阅读书籍全名&lt;a href=&quot;http://item.jd.com/11402853.html&quot;&gt;Effective Objective-C 2.0 编写高质量iOS与OS X 代码的52个有效方法&lt;/a&gt;
+最经买了本&lt;a href=&quot;http://item.jd.com/11779514.html&quot;&gt;编写高质量代码 改善Objective-C程序的61个建议&lt;/a&gt;，拿到手看了下目录感觉内容比这本52个有效方法更深点，之前只是浅度这本，具体讲什么也不是很记得了，所以打算先重新看下这本52个有效方法，然后再来拜读新入手的这本。
+这里准备记录下&lt;a href=&quot;http://item.jd.com/11402853.html&quot;&gt;Effective Objective-C 2.0 编写高质量iOS与OS X 代码的52个有效方法&lt;/a&gt;这本提到的知识点。&lt;/p&gt;
+
+&lt;h3&gt;第一章 熟悉Objective-C&lt;/h3&gt;
+
+&lt;h4&gt;第1条 了解Objective-C的起源&lt;/h4&gt;
+
+&lt;h5&gt;1.OC是C语音的超集，在C的基础上面添加了面向对象特征，并且是使用了消息结构并非函数调用。&lt;/h5&gt;
+
+&lt;p&gt;超集的意思大概就是爸爸跟儿子，S1就是S2的超集；
+&lt;img src=&quot;http://7xnp79.com1.z0.glb.clouddn.com/64380cd7912397dd663433635f82b2b7d0a2870c.png&quot; alt=&quot;&quot;&gt;
+消息结构与函数调用的区别是：消息结构最终执行的代码块是由运行环境决定的，函数调用的代码块有编译器决定，在编译的时候已经确定好。&lt;/p&gt;
+
+&lt;h5&gt;2.面向过程与面向对象的区别&lt;/h5&gt;
+
+&lt;p&gt;这个说实话我也不知道怎么解释 突然感觉很难回答这个问题&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;面向过程就是分析出解决问题所需要的步骤，然后用函数把这些步骤一步一步实现，使用的时候一个一个依次调用就可以了。
+面向对象是把构成问题事务分解成各个对象，建立对象的目的不是为了完成一个步骤，而是为了描叙某个事物在整个解决问题的步骤中的行为。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h5&gt;3.OC中的动态库与静态库&lt;/h5&gt;
+
+&lt;p&gt;博客：
+&lt;a href=&quot;http://www.cnblogs.com/cmx-ios2014/p/3802618.html?utm_source=tuicool&amp;amp;utm_medium=referral&quot;&gt;http://www.cnblogs.com/cmx-ios2014/p/3802618.html?utm_source=tuicool&amp;amp;utm_medium=referral&lt;/a&gt;
+&lt;a href=&quot;http://www.jianshu.com/p/42070c513104&quot;&gt;http://www.jianshu.com/p/42070c513104&lt;/a&gt;
+&lt;a href=&quot;http://www.cnblogs.com/striveLD/p/5752010.html&quot;&gt;http://www.cnblogs.com/striveLD/p/5752010.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5&gt;4.C语言中的内存模型&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.cnblogs.com/haore147/p/3921263.html&quot;&gt;http://www.cnblogs.com/haore147/p/3921263.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;h5&gt;5.内存中的堆空间(heap space) 栈(stack)&lt;/h5&gt;
+
+&lt;p&gt;分配在堆中的内存必须直接管理，分配在栈上用于保存变量的内存则会在栈帧弹出式自动清理。&lt;/p&gt;
+
+&lt;h5&gt;6.不能在栈上面分配OC对象&lt;/h5&gt;
+
+&lt;h5&gt;7.CGRect不属于OC对象&lt;/h5&gt;
+
+&lt;p&gt;相比于结构体，创建对象需要额外的开销，比如分配及释放内存堆，所以在操作一对非OC对象是，可以考虑用结构体来操作。&lt;/p&gt;
+
+&lt;h4&gt;第2条 在类的头文件中尽量少引用其他头文件&lt;/h4&gt;
+
+&lt;h5&gt;1.A类的头文件中有一个B类型的属性&lt;/h5&gt;
+
+&lt;p&gt;引用头文件的方式有3种：#import #incudule @class关键字
+首先说明#import是由gcc编译器支持的，其实就是#incudule改良版本
+#import确保了引用的这个文件只被引进一次，而#incudule就会出现死循环引用，导致程序报错；
+@class关键字“向前声明”告诉你有这个类，具体定义不清楚，这样子可以解决引用无法识别该对象的问题，也解决了循环引用的问题;
+#import #incudule 引进类来，会拿到这个类的头文件的信息了，这里违反了最少原则，所以一般在.h头文件中尽量少用；
+使用@class可以减少.h中对其他类的依赖、减少链接到其他类所需要的时间，从而降低编译时间；
+一般来说在.h中，首选@class 然后在迫不得已的时候才用#import(继承，实现协议)
+对于协议来说 可以使用类扩展在.m中申明一个匿名类别来声明，只有在子类需要统一实现这个协议的时候才会放在.h中，暂时没有了解到其他情况得非在.h中#import协议。&lt;/p&gt;
+
+&lt;h5&gt;2.两个类互相引用的问题 A类中有B类的属性 B类中也有A类的属性&lt;/h5&gt;
+
+&lt;p&gt;使用#incudule这样子会报错，但是使用#import的话只能保证一个类被编译到了，也是用问题的，在这里只能用@class解决这个循环引用的问题。
+&lt;del&gt;###3.在实现文件中声明此类实现了该委托协议，并把这段代码放在“class-continuation”分类中&lt;/del&gt;&lt;/p&gt;
+
+&lt;h4&gt;第3条 多使用字面量语法，少用与之等价的方法&lt;/h4&gt;
+
+&lt;h5&gt;1.好处缩减代码长度，更加易读&lt;/h5&gt;
+
+&lt;h5&gt;2.对于字面量数组/字典来说，对象中有nil会抛出异常&lt;/h5&gt;
+
+&lt;p&gt;NSArray *array = @[@&amp;quot;&amp;quot;,@&amp;quot;&amp;quot;,@&amp;quot;&amp;quot;];
+NSDictionary *dictionary = @{key:value}；&lt;/p&gt;
+
+&lt;h5&gt;3.糖衣语法(语法糖)&lt;/h5&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;糖衣语法，又叫‘语法糖’、‘语法盐’等等，是由英国计算机科学家彼得·约翰·兰达（Peter J.Landin）发明的一个术语，指计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用。通常来说使用语法糖能够增加程序的可读性，从而减少程序代码出错的机会。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;额，就是简单粗暴，减少出错；&lt;/p&gt;
+
+&lt;p&gt;&lt;del&gt;#####4.字面量语法 非字面量语法&lt;/del&gt;&lt;/p&gt;
+
+&lt;h4&gt;第4条 多用类型常量，少用#define预处理指令&lt;/h4&gt;
+
+&lt;h5&gt;1.#define预处理指令&lt;/h5&gt;
+
+&lt;p&gt;#define kAnimationTime 3
+在程序代码中多次使用同一个变量，可以用#define预处理指令来抽取，这样子可以达到第一层的抽取，在一般情况下面我们可以满足需求，利用define它会将kAnimationTime直接替换成3；所以这里如果定义在.h文件中，在其他引用了这个头文件的类中的kAnimationTime也会被替换，而且#define预处理指令是没有类型的，替换掉了也不清楚，可以在引用的地方修改定义好的值，有一定的风险，万一实在想用，记得注意命名问题和定义的位置。&lt;/p&gt;
+
+&lt;h5&gt;2.定义常量跟#define预处理指令的区别&lt;/h5&gt;
+
+&lt;p&gt;static const CGFloat kMargin = 10.0f；
+可以明确的定义清楚类型，防止使用代码修改值，这样子在使用的过程减少出错。
+定义名字的常用规则：需要限定在某编译单元(即本类中)则在前面添加k；
+需要在其他类可见，一般是用此类的类名做前缀；
+使用static修饰，是将该变量仅仅定义在该变量的编译单元中，如果不使用static修饰,编译器会为这个变量创建一个&amp;quot;外部符号&amp;quot;,此时其他类也声明了同名变量就会报错了。&lt;/p&gt;
+
+&lt;h5&gt;3.全局常量，需要添加到“全局符号表中”&lt;/h5&gt;
+
+&lt;p&gt;extern NSString *const PXYNotification;
+NSString *const PXYNotification = @PXYNotification&amp;quot;&amp;quot;;&lt;/p&gt;
+
+&lt;p&gt;&lt;del&gt;##第5条 用枚举表示状态、选项、状态码&lt;/del&gt;
+&lt;del&gt;###1.定义枚举的几种方式&lt;/del&gt;
+&lt;del&gt;###2.按位与操作符&lt;/del&gt;
+&lt;del&gt;###3.NS_ENUM与NS_OPTIONS宏的区别&lt;/del&gt;&lt;/p&gt;
 </description>
-        <pubDate>Wed, 09 Nov 2016 00:00:00 +0800</pubDate>
-        <link>http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/</link>
-        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/11/iOSzhi-shi-xiao-jie-1/</guid>
+        <pubDate>Thu, 28 Jul 2016 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2016/07/Effective-Objective-C-2.0-zongjie-one/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2016/07/Effective-Objective-C-2.0-zongjie-one/</guid>
         
         
       </item>
