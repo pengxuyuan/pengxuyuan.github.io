@@ -5,9 +5,162 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 17 Nov 2016 22:59:40 +0800</pubDate>
-    <lastBuildDate>Thu, 17 Nov 2016 22:59:40 +0800</lastBuildDate>
-    <generator>Jekyll v3.1.6</generator>
+    <pubDate>Fri, 21 Apr 2017 11:10:37 +0800</pubDate>
+    <lastBuildDate>Fri, 21 Apr 2017 11:10:37 +0800</lastBuildDate>
+    <generator>Jekyll v3.1.1</generator>
+    
+      <item>
+        <title>NSTimer 知识点</title>
+        <description>&lt;p&gt;[TOC]&lt;/p&gt;
+
+&lt;h3&gt;NSTimer 是什么&lt;/h3&gt;
+
+&lt;p&gt;定时器 一般都是用来做一些周期性的任务&lt;/p&gt;
+
+&lt;h3&gt;使用遇到什么问题&lt;/h3&gt;
+
+&lt;p&gt;内存释放问题、定时器失效问题&lt;/p&gt;
+
+&lt;h3&gt;为什么会出现这些问题&lt;/h3&gt;
+
+&lt;h4&gt;内存释放问题&lt;/h4&gt;
+
+&lt;p&gt;当定时器被加到run loop 生效的时候，run loop 会强引用这个定时器对象（retain），然后定时器又会强引用这个Target 对象，这样子就会导致这个定时器一直存在，这个Target 对象一直存在，导致一直释放不了&lt;/p&gt;
+
+&lt;p&gt;单纯将NSTimer置为nil，是不能使定时器失效的，runloop 已经强引用这个timer 了，要使得定时器失效需要调用invalidate 方法&lt;/p&gt;
+
+&lt;h4&gt;定时器失效问题  （场景：滑动TableView 的时候，定时器失效）&lt;/h4&gt;
+
+&lt;p&gt;run loop 里面有很多模式，但是一个时间点只会处在一个模式下，在某个模式的时候，只会处理和调度这个模式下面的事件和资源，NSTimer 在用scheduledTimerWithTimeInterval 生成的时候是以默认模式加入到当前的run loop，然后模式是NSDefaultRunLoopMode，但是当TableView 滑动的时run loop 会切换到UITrackingRunLoopMode 这个模式，所以此时NSTimer 就会失效&lt;/p&gt;
+
+&lt;p&gt;所以这里是：当run loop 切换到不是timer 加入run loop 时的模式时，这个定时器就会暂时失效&lt;/p&gt;
+
+&lt;h4&gt;关于手动将timer 置为nil 的意义&lt;/h4&gt;
+
+&lt;p&gt;一个变量，如果被 strong 修饰，和被 weak 修饰，是有一定的区别的。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;strong&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;若一个变量被 strong 修饰 （临时变量或者非 property 变量默认 strong 修饰），则其为强指针指向，在被赋值的时候，会强引用赋值对象。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;weak&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;若一个变量被 weak 修饰，则其为弱指针指向，弱指针指向的对象，如果没有被外界进行强引用的话，会在初始化方法完成之后，将变量置空。&lt;/p&gt;
+
+&lt;p&gt;在 timer 被 strong 和 weak 修饰时的区别&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;如果 timer 被 strong 修饰，那么 timer 会被 self 持有一次，加入 runloop 之后，会被 runloop 再持有一次，invalidate 只会解除 runloop 对 timer 的持有，self 还是会 持有 timer ，所以需要手动置为 nil ，解除 self 对 timer 的持有。&lt;/li&gt;
+&lt;li&gt;如果 timer 被 weak 修饰，那么 timer 不会被 self 持有，只是 runloop 对 timer 有一次持有（==前提是外界没有持有该timer，如果外界持有了，需要外界也手动置空==），invalidate 解除了 runloop 对 timer 的持有之后，系统会自动将 timer 置空。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果我们用了懒加载，而且 timer 是weak 修饰，没有初始化过，在下面这种写法的时候，&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;[self.timer invalidate];
+NSLog(@&amp;quot;%@&amp;quot;, _timer);
+[self.timer fire];
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;会发现，打印出来的 _timer 依然有值。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;原因是&lt;/strong&gt;：因为 timer 并没有被初始化，我们在调用 &lt;code&gt;self.timer&lt;/code&gt; 的时候，会走get方法，因为我们在 get 方法里做了懒加载，就会走一遍初始化，但是我们又在初始化方法里，加进了 runloop ，runloop 强引用了 timer ，那么在 get 方法执行完之后，timer 并不会被销毁。但是，我们又调用了 invalidate ，这个操作只会解除 runloop 对 timer 的持有，引用计数 -1，却并不会立即将 timer 置为 nil ，所以在 调用打 log 和  &lt;code&gt;[self.timer fier]&lt;/code&gt; 的时候，get 方法并不会走初始化操作了，但是因为 timer 已经不被 runloop 强引用了，所以会失效。&lt;/p&gt;
+
+&lt;h4&gt;关于调用invalidate 方式&lt;/h4&gt;
+
+&lt;p&gt;在调用invalidate 是否需要用valid 来判断，懒加载的情况是需要的，因为会被置为nil，多次调用的时候会重新创建，但是直接会被invalidate，这里定位会比较麻烦
+invalidate 这个是使定时器失效的，调用的时候不能dealloc 里面去调用，因为run loop 强引用了定时器，定时器又强引用了Target 对象，这个时候VC 是不会被释放的，自然不会走dealloc 方法&lt;/p&gt;
+
+&lt;h4&gt;关于NSTimer 暂停开始&lt;/h4&gt;
+
+&lt;p&gt;这里最优雅的方式就是写一个NSTimer 的分类，然后用fireDate 触发时间来处理&lt;/p&gt;
+
+&lt;h3&gt;如何正确使用&lt;/h3&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;#pragma mark - Lazzy load
+- (NSTimer *)timer {
+    if (_timer == nil) {
+        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(timerStep) userInfo:nil repeats:YES];
+    }
+    return _timer;
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    if ([self.timer isValid]) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;h3&gt;NSTimer 官方文档介绍&lt;/h3&gt;
+
+&lt;h4&gt;NSTimer&lt;/h4&gt;
+
+&lt;p&gt;你可以用NSTimer 这个类来创建定时器对象。定时器会等待一个时间间隔然后触发，向一个目标对象（Target）发送特定的消息。例如你可以创建一个定时器对象，发消息到window，告诉它隔一段时间就更新自己&lt;/p&gt;
+
+&lt;h4&gt;Overview&lt;/h4&gt;
+
+&lt;p&gt;定时器跟run loop 一起工作，要有效地使用定时器，你应该注意run loop 的运行机制 — 可以参阅NSRunLoop 和Threading Programming Guide 章节。特别注意，run loop 会对run loop 中的定时器维持强引用，所以你不需要在把这个定时器加入到run loop 后对它维持强引用&lt;/p&gt;
+
+&lt;p&gt;定时器并不是一个实时机制；只有run loop 正在运行的模式是定时器加到run loop 的模式时候并且检查到这个定时器的触发时间是否过去，这样子定时器才会触发。（run loop 有很多种模式，但是一个时间点只会处在一个模式下，然后定时器加入到run loop 也是可以设置需要加入到run loop 什么模式下的）因为有存在各种输入源，run loop 是典型的循环运行管理，所以定时器间隔的有效分辨是在50-100毫秒量级。如果定时器要触发的时候出现了一个耗时的操作或者当前run loop 模式不是定时器加入时候的模式，这样子定时器是不会被触发的直到下次run loop 检查定时器。&lt;/p&gt;
+
+&lt;p&gt;因此，定时器的触发的实际时间有可能是预定触发时间之后的相当长的一段时间，另请参考&lt;a href=&quot;#Timer%20Tolerance&quot;&gt;Timer Tolerance&lt;/a&gt;章节&lt;/p&gt;
+
+&lt;p&gt;NSTimer 跟 Core Foundation的CFRunLoopTimerRef是“toll-free bridge”，有关toll-free bridging 信息请参考Toll-free Bridging 章节&lt;/p&gt;
+
+&lt;h4&gt;Repeating Versus Non-Repeating Timers （重复与不重复定时器）&lt;/h4&gt;
+
+&lt;p&gt;你在创建定时器可以指定是重复的还是不重复的。不重复定时器触发一次，然后会自动的使其自动失效，从而防止定时器再次触发。相比之下，重复定时器会在相同的run loop 上面触发并且重新排列&lt;/p&gt;
+
+&lt;p&gt;重复定时器总是根据预定的触发时间自动安排，而不是根据实际的触发时间。例如，如果定时器计划在一个特定的时间点和之后的每5秒触发， 尽管实际的触发时间延迟了，预定的触发时间依然是在原始时间点的之后5秒，如果触发时间被延迟到它下一个（或者下几个）触发时间，则这个时间段定时器只会触发一次，然后定时器在触发后会重新排列，等待下一个预定的触发时间&lt;/p&gt;
+
+&lt;h4&gt;Timer Tolerance 定时器误差&lt;/h4&gt;
+
+&lt;p&gt;在iOS 7及更高版本以及macOS 10.9及更高版本中，你可以指定定时器的的误差。误差可以使得在定时器触发的时候系统更加灵活，可以提高系统的优化能力，从而提高功率节省和响应能力。 定时器会在预定的触发时间点和预定触发时间点加上误差时间之间触发(A&amp;lt;-&amp;gt;A+误差)。计时器不会在预定触发时间点之前触发。对于重复定时器，下一个触发时间是从原始时间点开始计算的，不会因为个别触发时间的误差来重新计算，避免时间点偏移。误差值默认是0，这就意味着不会加上误差，但是系统保留对某个定时器触发加上一个很小的误差的权利，这个时候不会考虑这个误差属性&lt;/p&gt;
+
+&lt;p&gt;使用定时器，你最好了解一个合适的定时器误差值。一般的经验法则是将这个误差值最少设置成定时器间隔的10%，尽管是一个很小的误差值，也会对应用程序的耗电产生很大的积极影响。&lt;/p&gt;
+
+&lt;h4&gt;Scheduling Timers in Run Loops&lt;/h4&gt;
+
+&lt;p&gt;一个定时器对象只能在run loop 中注册一次，尽管它可以被加到run loop 中的不同的run loop模式中去，这里有3中方法创建定时器：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Use the scheduledTimerWithTimeInterval:invocation:repeats: or scheduledTimerWithTimeInterval:target : selector:userInfo:repeats: class method to create the timer and schedule it on the current run loop in the default mode.&lt;/p&gt;
+
+&lt;p&gt;用这两个类方法创建定时器对象，会将这个定时器对象以默认run loop 模式（NSDefaultRunLoopMode）加到当前的run loop 中&lt;/p&gt;
+
+&lt;p&gt;Use the timerWithTimeInterval:invocation:repeats: or timerWithTimeInterval`:targetselector:userInfo:repeats: class method to create the timer object without scheduling it on a run loop. (After creating it, you must add the timer to a run loop manually by calling the addTimer:forMode: method of the corresponding NSRunLoop object.)&lt;/p&gt;
+
+&lt;p&gt;用这个两个类方法创建定时器对象，不会将这个对象加入到run loop 中，在创建对象后，你必须手动的将这个定时器对象加入到一个run loop 中，[[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];&lt;/p&gt;
+
+&lt;p&gt;Allocate the timer and initialize it using the initWithFireDate:interval:target :selector:userInfo:repeats: method. (After creating it, you must add the timer to a run loop manually by calling the addTimer:forMode: method of the corresponding NSRunLoop object.)
+在创建对象后，你必须手动的将这个定时器对象加入到一个run loop 中，[[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;一旦添加到run loop中，定时器会在指定的时间间隔触发直到这个定时器失效（invalidate）。一个不重复的定时器在触发后立即使其自动失效。但是对于重复的定时器调用invalidate 才能使它失效。调用invalidate 这个方法会从当前的run loop 中移除这个定时器。因此你应该在创建这个定时器的线程调用这个invalidate 方法。会立即使这个定时器失效，使其不再影响这个run loop。在invalidate 方法返回前后，这个run loop 会移除这个定时器和对这个定时器的强引用。一旦失效，这个定时器对象不能被重用&lt;/p&gt;
+
+&lt;p&gt;在重复定时器触发之后，它会安排下一次预定时间点的触发，这个时间点是上一次触发时间点间隔的整数倍，在公差范围内。如果调用选择器方法或者调用NSInvocation 花费的时间长于定时器的间隔时间，则这个定时器会安排在下一次再触发，也就是说，定时器不会尝试补偿在调用选择器方法或调用NSInvocation 过久导致错过启动时间。&lt;/p&gt;
+
+&lt;h4&gt;Subclassing Notes&lt;/h4&gt;
+
+&lt;p&gt;你不应该尝试去创建NSTimer 的子类  Crash&lt;/p&gt;
+
+&lt;h4&gt;Symbols&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/pengxuyuan/quzhibo/master/NSTimer/B9E579FA-AF03-43E2-AB2C-31F7C742D5B7.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;h4&gt;Relationships&lt;/h4&gt;
+
+&lt;p&gt;Inherits From NSObject&lt;/p&gt;
+</description>
+        <pubDate>Fri, 21 Apr 2017 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2017/04/NSTimer/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2017/04/NSTimer/</guid>
+        
+        
+      </item>
     
       <item>
         <title>Effective Objective-C 2.0 总结（一）</title>
