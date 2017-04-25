@@ -5,9 +5,315 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 24 Apr 2017 14:08:06 +0800</pubDate>
-    <lastBuildDate>Mon, 24 Apr 2017 14:08:06 +0800</lastBuildDate>
+    <pubDate>Wed, 26 Apr 2017 00:00:37 +0800</pubDate>
+    <lastBuildDate>Wed, 26 Apr 2017 00:00:37 +0800</lastBuildDate>
     <generator>Jekyll v3.1.1</generator>
+    
+      <item>
+        <title>Effective Objective-C 2.0 总结（一）</title>
+        <description>&lt;h2&gt;熟悉Objective-C&lt;/h2&gt;
+
+&lt;h3&gt;前言&lt;/h3&gt;
+
+&lt;p&gt;最经买了本&lt;a href=&quot;http://item.jd.com/11779514.html&quot;&gt;编写高质量代码 改善Objective-C程序的61个建议&lt;/a&gt;，拿到手看了下目录感觉内容比这本52个有效方法更深点，之前的这本也是浅浅的看过，具体讲什么也不是很记得了，所以打算先重新看下这本52个有效方法，然后再来拜读新入手的这本。&lt;/p&gt;
+
+&lt;p&gt;这里准备记录下&lt;a href=&quot;http://item.jd.com/11402853.html&quot;&gt;Effective Objective-C 2.0 编写高质量iOS与OS X 代码的52个有效方法&lt;/a&gt;这本提到的知识点。&lt;/p&gt;
+
+&lt;h3&gt;第 1 条：了解Objective-C 语言的起源&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Objective-C 在C 语言基础上添加了面向对象特性。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;关于面向过程、面向对象的区别大概是：面向对象是将事物高度抽象化， 面向过程是一种自顶向下的编程。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;面向过程就是分析出解决问题所需要的步骤，然后用函数把这些步骤一步一步实现，使用的时候一个一个依次调用就可以了。 &lt;/p&gt;
+
+&lt;p&gt;面向对象是把构成问题事务分解成各个对象，建立对象的目的不是为了完成一个步骤，而是为了描叙某个事物在整个解决问题的步骤中的行为。 &lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;这个问题没有固定的答案，每个人回答的思路都是不一样的，这里可以看下逼乎上面的回答。（PS：是在下经验尚浅，不知如何回答）&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/27468564?sort=created&quot;&gt;“面向对象&amp;quot;和&amp;quot;面向过程&amp;quot;到底有什么区别？&lt;/a&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;使用消息结构的语言，其运行时所应执行的代码由运行环境来决定；而使用函数调用的语言，则由编译器决定。（Objective-C 利用运行时系统（Runtime ）来做到消息传递，也叫做动态绑定 ）&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Objective-C 的重要工作都由 “运行期组件”（runtime component）而非编译器来完成，运行期组件本质上就是一种与开发者所编代码相链接的 “动态库”（dynamic libary），其代码能把开发者编写的所有程序粘合起来。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;关于静态库跟动态库的区别在于：静态库在编译的时候直接拷贝一份到应用程序的，会使得程序变大；动态库是在运行的时候加载到内存，程序会链接到动态库，不会使得程序变大，动态库相当于共享库，多个应用程序之间可以共享。&lt;/p&gt;
+
+&lt;p&gt;关于静态库、动态库的知识点以及制作：&lt;a href=&quot;http://blog.csdn.net/liangliang2727/article/details/52941394&quot;&gt;iOS 静态库和动态库的基本介绍和使用&lt;/a&gt;、&lt;a href=&quot;http://www.cnblogs.com/Jenaral/p/5530383.html&quot;&gt;iOS 静态库，动态库与 Framework 浅析&lt;/a&gt;、&lt;a href=&quot;https://www.valiantcat.cn/index.php/2017/04/24/45.html&quot;&gt;组件化-动态库实战&lt;/a&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Objective-C 是C 的 “超集”，所以C 语言中的所有功能在编写Objective-C 代码时依然适用。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;超集的意思大概就像爸爸跟儿子的区别：S1 就是 S2 的超集，S2 有的 S1 都有。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7xnp79.com1.z0.glb.clouddn.com/64380cd7912397dd663433635f82b2b7d0a2870c.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;C 语言的内存模型（memory medel ），对象所占的内存总是分配在 “堆空间”（heap space）中，而绝不会分配在 “栈”（stack）上，不能在栈上面分配Objective-C 对象。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;分配在堆中的内存必须直接管理，而分配在栈上用于保存变量的内存则会在其栈帧弹出时自动清理，Objective-C 将堆内存管理抽象出来了，不需要用malloc 及free 来分配或释放对象所占内存，Objective-C 运行期环境把这部分工作抽象成一套内存管理架构，叫 ”引用计数“ 。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/anyaas/article/details/17099377&quot;&gt;C语言内存模型及运行时内存布局&lt;/a&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;对于创建结构体相比，创建对象需要额外的开销，例如分配及释放堆内存等操作，所以Objective-C 对于 ”非对象类型“ 通常都是适用结构体来存储，储存在栈空间。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;​&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Objective-C 为C 语言添加了面向对象特性，是其超集。Objective-C 使用动态绑定的消息结构，也就是说，在运行时才会检查对象类型。接收一条消息之后，究竟应执行何种代码，由运行期环境而非编译器来决定。&lt;/li&gt;
+&lt;li&gt;理解C 语言的核心概念有助于写好Objective-C 程序。尤其要掌握内存模型与指针。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 2 条：在类的头文件中尽量少引用其他头文件&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Objective-C  标准编写类方式也是头文件、实现文件组成&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;场景：A 类的头文件中有一个B 类型的属性&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   @property (nonatomic,strong) B *b;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;要通过编译，处理方式有3种：使用#import  #incudule  @class关键字&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;使用#import #include 这个时候可以解决问题，但不够优雅，这里就要知道B 类的具体细节，这里会引用到B 类的具体实现，会增加编译时间&lt;/li&gt;
+&lt;li&gt;使用@class关键字，@class关键字 “向前声明” 告诉你有这个类，具体定义不清楚，这里就不依赖B 类的信息，这里从另外一个角度来看，可以减少A、B 之间的耦合&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+&lt;li&gt;两个类互相引用的问题： A 类中有B 类的属性，B 类中也有A 类的属性&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+&lt;li&gt;首先说明 #import 是由gcc 编译器支持的，其实就是 #incudule 改良版本；#import 确保了引用的这个文件只被引进一次，而#incudule 就会出现死循环引用，导致程序报错；&lt;/li&gt;
+&lt;li&gt;这里使用 #import、#incudule 都不能解决这个循环问题，这里只能使用@class 来破解&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+&lt;li&gt;所以应该将引入头文件的时机尽量延后，只有确有需要的时候才引用，这样子可以减少类的使用者所需引用的头文件数量。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;使用@class 可以减少.h中对其他类的依赖、减少链接到其他类所需要的时间，从而降低编译时间。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;一般来说在.h中，首选@class 然后在迫不得已的时候才用#import (继承，实现协议)，对于协议来说 可以使用类扩展，在.m中声明一个匿名类别来声明，只有在子类需要统一实现这个协议的时候才会放在.h中，暂时没有了解到其他情况得非在.h中#import协议。&lt;/p&gt;
+
+&lt;p&gt;​&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;除非确有必要，否则不要引入头文件。一般来说，应在某个类的头文件中使用向前声明来提及别的类，并在实现文件中引入那些类的头文件。这样子可以尽量降低类之间的耦合（coupling）。&lt;/li&gt;
+&lt;li&gt;有时无法使用向前声明，比如要声明某个类遵循一项协议。这种情况下，尽量把 “该类遵循某协议” 的这样声明移至 “class-continuation 分类中” 中。如果不行的话，就把协议单独放在一个头文件，然后将其引入。&lt;/li&gt;
+&lt;li&gt;“class-continuation 分类”，其实就是一个特殊的分类，写在实现文件中的分类，只能被该实现文件所引用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 3 条：多用字面量语法，少用与之等价的方法&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;使用字面量语法可以缩减源代码长度，使其更加易读，减少代码出错机率。字面量语法实际是一种 “语法糖”，也称 “糖衣语法”，是指计算机语言中与另外一套语法等效但是开发者用起来却更加方便的语法。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;字面数值&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   NSNumber *someNumner = @1;
+   NSNumber *intNumner = @1;
+   NSNumber *floatNumner = @2.5f;
+   NSNumber *doubleNumner = @3.14159;
+   NSNumber *charNumner = @&amp;#39;s&amp;#39;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;字面量数组&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   NSArray *array = @[@&amp;quot;a&amp;quot;,@&amp;quot;b&amp;quot;@&amp;quot;c&amp;quot;];
+   NSString *string = array[0];
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;字面量字典&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   NSDictionary *dict = @{@&amp;quot;key&amp;quot;:@&amp;quot;value&amp;quot;};
+   NSString *string = dict[@&amp;quot;key&amp;quot;];
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;可变数组与字典&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   NSMutableArray *mutable = [@[@&amp;quot;a&amp;quot;,@&amp;quot;b&amp;quot;] mutableCopt];
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;局限性&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;字面量所创建的对象必须属于Foundation 框架，如果自定义这些类的子类，则无法用字面量语法创建其对象。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;字符串字面量创建的是常量，对象不在持有了也不会立马被释放&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   例子：
+
+   __strong NSObject *yourObject= [NSObject new];
+   __weak NSObject *myObject = yourObject;
+   yourObject = nil;
+   __unsafe_unretained NSObject *theirObject = myObject;
+   NSLog(@&amp;quot;%p %@&amp;quot;, yourObject, yourObject);
+   NSLog(@&amp;quot;%p %@&amp;quot;, myObject, myObject);
+   NSLog(@&amp;quot;%p %@&amp;quot;, theirObject, theirObject);
+
+   2017-02-16 11:02:37.702543 TKApp[1767:599122] 0x0 (null)
+   2017-02-16 11:02:38.612380 TKApp[1767:599122] 0x0 (null)
+   2017-02-16 11:02:40.985613 TKApp[1767:599122] 0x0 (null)
+
+
+   __strong NSString *yourString = @&amp;quot;Your String&amp;quot;; 
+   __weak NSString *myString = yourString;
+   yourString = nil;
+   __unsafe_unretained NSString *theirString = myString;
+   NSLog(@&amp;quot;%p %@&amp;quot;, yourString, yourString);
+   NSLog(@&amp;quot;%p %@&amp;quot;, myString, myString);
+   NSLog(@&amp;quot;%p %@&amp;quot;, theirString, theirString);
+
+   2017-02-16 11:00:42.407410 TKApp[1757:597837] 0x0 (null)
+   2017-02-16 11:00:44.340836 TKApp[1757:597837] 0x1013b9480 Your String
+   2017-02-16 11:00:45.392346 TKApp[1757:597837] 0x1013b9480 Your String
+
+   这里主要有2个知识点：
+   1.关于ARC中的引用计数问题
+   2.字符串常量和字符串字面量的区别是什么？
+
+   Line By Line
+   第一种情况：
+   __strong NSObject *yourObject = [NSObject new];
+   yourObject New了一个NSObject对象 并且持有 对象引用计数＋1
+
+   __weak NSObject *myObject = yourObject;
+   myObject 指向 yourObject指向的的对象地址 没有持有 对象引用计数 不变
+
+   yourObject = nil;
+   yourObject 指向nil 不持有NSObject对象 对象不被持用 引用计数－1 这个时候这个对象自动释放
+
+   __unsafe_unretained NSObject *theirObject = myObject;
+   这个时候myObject已经被置为nil了 所以theirObject也为nil
+
+   第二种情况：
+   本来第二种情况也应该类似像第一种，这里就是关于字符串常量和字符串字面量的区别了。
+
+   What&amp;#39;s the difference between a string constant and a string literal?
+
+   在这里为什么没有释放的情况跟字符串常量没什么联系，主要是这里是一个字符串字面量，字符串字面值创建了不会再修改了，一个对象持有这个字符串，当它不指向它了，也不会立马释放。
+   这里还有个点，Objective-C 会做字符串的编译单元，而且会合并相同字符串的编译单元，来减少额外的消耗去链接这些编译单元。
+
+   NSString *string1 = @“pengxuyuan”;
+   NSString *string2 = @“pengxuyuan”;
+
+   string1跟string2内存地址是一样的。
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;参考资料：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/25746/whats-the-difference-between-a-string-constant-and-a-string-literal&quot;&gt;What&amp;#39;s the difference between a string constant and a string literal?&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/10922888/weak-nsstring-variable-is-not-nil-after-setting-the-only-strong-reference-to-nil&quot;&gt;Weak NSString variable is not nil after setting the only strong reference to nil&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;​&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;应该使用字面量语法来创建字符串、数值、数组、字典。与创建此类对象的常规方法相比，这么做更加简明扼要。&lt;/li&gt;
+&lt;li&gt;应该通过取下标操作来访问数组下标或字典中的健所对应的元素。&lt;/li&gt;
+&lt;li&gt;用字面量语法创建数组或字典时，若值中有nil，则会抛出异常。因此，务必确保值里不含nil。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 4 条：多用类型常量，少用#define 预处理指令&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在编码时候多次用到一个变量（数值，字符串等），我们会进行抽取以便修改一处所有用到的地方都会生效。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我们可能会使用#define 预处理指令&lt;code&gt;#define ANIMATION_DURATION 0.3&lt;/code&gt; 编译的时候会将遇到的ANIMATION_DURATION 替换成0.3，这样子可以解决问题，但是会存在一些问题：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;预处理指令是没有包含类型的，有可能会将一些不需替换的也替换掉，导致异常&lt;/li&gt;
+&lt;li&gt;还有如果这个预处理被定义在头文件的话，引入了这个头文件的ANIMATION_DURATION 都会被替换，这是我们不希望看到的&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个时候我们定义一个常量的话，就可以包含类型信息&lt;code&gt;static const NSTimerInterval kAnimationDuration = 0.3;&lt;/code&gt;  这样子在编译的过程中就可以清楚的知道要替换的类型，如果不一致会报警告，这样子也方便排查问题；常用的命名法是：若常量局限于 “编译单元”（translation-unit，也就是 “实现文件” 中），则在前面加字母k；若常量在类之外可见，则通常已类名作为前缀。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;定义常量的位置很重要。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果将&lt;code&gt;#define ANIMATION_DURATION 0.3&lt;/code&gt;  &lt;code&gt;static const NSTimerInterval kAnimationDuration = 0.3;&lt;/code&gt;  定义在头文件，引入了这个头文件都会有这个名字，而且  &lt;code&gt;static const NSTimerInterval kAnimationDuration = 0.3;&lt;/code&gt;  定义在头文件的话，等于会声明一个全局变量，这样子所有类都可以使用了，这样子我们应该用类型作为前缀。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;static 修饰符则意味该变量仅在此变量的编译单元可见。编译器每收到一个编译单元，就会输出一份 “目标文件”（object file）。在Objective-C 的语境下，”编译单元“ 通常指每个类的实现文件（.m 文件），如果声明此变量不加static，则编译器会为它创建一个 “外部符号”（external symbol），如果其他编译单元也声明同样的变量就会报错了。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果用static 和 const 声明一个变量，不会创建符号，而是会像#define 预处理指令一样，将遇到的变量全部替换，但是区别在这样子有变量类型。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如果要定义一个外界可见的常量变量（constant variable），可以放在 “全局符号表”（global symbol table）中，来全局使用。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   //In the header file
+   extern NSString *const EOCStringConstant;
+
+   //In the implementtation file
+   NSString *const EOCStringConstant = @&amp;quot;VALUE&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;编译器会在 “数据段”（data section）为字符串分配存储空间，这里在上面C 语言的内存模型有讲，数据段通常是指用来存放程序中已初始化的全局变量的一块内存区域。数据段属于静态内存分配。 &lt;/p&gt;
+
+&lt;p&gt;​&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;不要用预处理指令定义常量。这样定义出来的常量不含类型信息，编译器只是会在编译前据此执行查找与替换操作。即使有人重新定义了常量值，编译器也不会产生警告信息，这将导致应用程序中的常量值不一致。&lt;/li&gt;
+&lt;li&gt;在实现文件中使用static const 来定义 “只在编译单元内可见的常量“（translation-unitspecific constant）。由于此类常量不在全局符号表中，所以无须为其名称加前缀。&lt;/li&gt;
+&lt;li&gt;在头文件中使用extern 来声明全局变量，并在相关实现文件中定义其值。这种常量要出现在全局符号表中，所以其名称应加以区隔，通常用与之相关的类型做前缀&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 5 条：用枚举表示状态、选项、状态码&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;C++ 11 标准扩充了枚举的特性，最新系统框架使用了 “强类型”（strong type）的枚举。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;实现枚举所用的数据类型取决于编译器，不过其二进制位（bit）的个数必须能完全表示下枚举编号才行，一个字节含8个二进制位，所以至多能表示256中（2&lt;sup&gt;8&lt;sup&gt;个）枚举（编号为0～255）的枚举变量。&lt;/sup&gt;&lt;/sup&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;只要枚举定义得对，各选项之间就可通过 “按位或操作符”（bitwise OR operator）来组合。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;用宏来定义枚举类型，这些宏具备向后兼容（backward compatibility）能力，如果目标平台编译器支持新标准，那就使用新式语法，否则改用旧式语法。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   typedef NS_ENUM(NSUInterger,EOCConnectionState) {
+    EOCConnectionStateDisconnected,
+    EOCConnectionStateConnecting,
+    EOCConnectionStateConnected,
+   };
+
+   typedef NS_OPTINS (NSUInterger,EOCPermittedDirection) {
+        EOCPermittedDirectionUp     = 1 &amp;lt;&amp;lt; 0,
+       EOCPermittedDirectionDown    = 1 &amp;lt;&amp;lt; 1,
+       EOCPermittedDirectionLeft    = 1 &amp;lt;&amp;lt; 2,
+       EOCPermittedDirectionRight   = 1 &amp;lt;&amp;lt; 3,
+   }
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;在switch 语句中，最好不要有default 分支，这样子要做到处理所有样式，这样子在新家类型的时候，没有default 编译器会发出警告，让我们注意到。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;应该用枚举来表示状态机的状态、传递给方法的选项以及状态码等值，给这些值起个易懂的名字。&lt;/li&gt;
+&lt;li&gt;如果把传递给某个方法的选项表示为枚举类型，而多个选项又可同时使用，那么就将各选项值定义为2的幂，以便通过按位或操作将其组合起来。&lt;/li&gt;
+&lt;li&gt;用NS_ENUM 与 NS_OPTIONS 宏来定义枚举类型，并指明其底层数据类型。这样做可以确保枚举是用开发者所选的底层数据类型实现的，而不会才用编译器所选的类型。&lt;/li&gt;
+&lt;li&gt;在处理枚举类型的switch 语句中不要实现defauly 分支。这样的话，加入新枚举之后，编译器就会提示开发者：switch 语句并未处理所有枚举。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Mon, 24 Apr 2017 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2017/04/Effective-Objective-C-2.0-one/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2017/04/Effective-Objective-C-2.0-one/</guid>
+        
+        
+      </item>
     
       <item>
         <title>iOS Security 安全白皮书（一）</title>

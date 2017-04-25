@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Effective Objective-C 2.0 总结（一）</title>
+  <meta name="description" content="熟悉Objective-C">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Effective Objective-C 2.0 总结（一）">
+  <meta name="twitter:description" content="熟悉Objective-C">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Effective Objective-C 2.0 总结（一）">
+  <meta property="og:description" content="熟悉Objective-C">
+
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://pengxuyuan.github.io/2017/04/Effective-Objective-C-2.0-one/">
+  <link rel="alternate" type="application/rss+xml" title="彭序猿" href="http://pengxuyuan.github.io/feed.xml">
+
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+  <!-- Hit Kounter -->
+  <script src="http://hitk.applinzi.com/scripts/dst/hit-kounter.js"></script>
+  <script src="https://cdn1.lncld.net/static/js/av-mini-0.6.10.js"></script>
+  <script src="http://jerry-cdn.b0.upaiyun.com/hit-kounter/hit-kounter-lc-0.2.0.js"></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 彭序猿 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="彭序猿 logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 彭序猿" class="blog-button">彭序猿</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">耕读传家，学为好人</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        <p class="panel-cover__description">我们做技术的，不会耍什么心眼，从来都是你看我顺眼，我看你顺眼，那我们就是好基友～</p>
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">博客</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/pengguang9412197045" title="@pengguang9412197045 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/pengxuyuan" title="@pengxuyuan 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:451946155@qq.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-slate"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-04-24 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2017-04-24</time> &#8226; <span class="post-meta__tags tags"></span>
+      <span class="post-meta__date date">浏览量：<span data-hk-page="current"> - </span> 次<span class="post-meta__date date"></span></span>
+    </div>
+    <h1 class="post-title">Effective Objective-C 2.0 总结（一）</h1>
+  </header>
+
+  <section class="post">
+    <h2>熟悉Objective-C</h2>
+
+<h3>前言</h3>
+
+<p>最经买了本<a href="http://item.jd.com/11779514.html">编写高质量代码 改善Objective-C程序的61个建议</a>，拿到手看了下目录感觉内容比这本52个有效方法更深点，之前的这本也是浅浅的看过，具体讲什么也不是很记得了，所以打算先重新看下这本52个有效方法，然后再来拜读新入手的这本。</p>
+
+<p>这里准备记录下<a href="http://item.jd.com/11402853.html">Effective Objective-C 2.0 编写高质量iOS与OS X 代码的52个有效方法</a>这本提到的知识点。</p>
+
+<h3>第 1 条：了解Objective-C 语言的起源</h3>
+
+<ol>
+<li>Objective-C 在C 语言基础上添加了面向对象特性。</li>
+</ol>
+
+<p>关于面向过程、面向对象的区别大概是：面向对象是将事物高度抽象化， 面向过程是一种自顶向下的编程。</p>
+
+<blockquote>
+<p>面向过程就是分析出解决问题所需要的步骤，然后用函数把这些步骤一步一步实现，使用的时候一个一个依次调用就可以了。 </p>
+
+<p>面向对象是把构成问题事务分解成各个对象，建立对象的目的不是为了完成一个步骤，而是为了描叙某个事物在整个解决问题的步骤中的行为。 </p>
+</blockquote>
+
+<p>这个问题没有固定的答案，每个人回答的思路都是不一样的，这里可以看下逼乎上面的回答。（PS：是在下经验尚浅，不知如何回答）</p>
+
+<p><a href="https://www.zhihu.com/question/27468564?sort=created">“面向对象&quot;和&quot;面向过程&quot;到底有什么区别？</a></p>
+
+<ol>
+<li><p>使用消息结构的语言，其运行时所应执行的代码由运行环境来决定；而使用函数调用的语言，则由编译器决定。（Objective-C 利用运行时系统（Runtime ）来做到消息传递，也叫做动态绑定 ）</p></li>
+<li><p>Objective-C 的重要工作都由 “运行期组件”（runtime component）而非编译器来完成，运行期组件本质上就是一种与开发者所编代码相链接的 “动态库”（dynamic libary），其代码能把开发者编写的所有程序粘合起来。</p></li>
+</ol>
+
+<p>关于静态库跟动态库的区别在于：静态库在编译的时候直接拷贝一份到应用程序的，会使得程序变大；动态库是在运行的时候加载到内存，程序会链接到动态库，不会使得程序变大，动态库相当于共享库，多个应用程序之间可以共享。</p>
+
+<p>关于静态库、动态库的知识点以及制作：<a href="http://blog.csdn.net/liangliang2727/article/details/52941394">iOS 静态库和动态库的基本介绍和使用</a>、<a href="http://www.cnblogs.com/Jenaral/p/5530383.html">iOS 静态库，动态库与 Framework 浅析</a>、<a href="https://www.valiantcat.cn/index.php/2017/04/24/45.html">组件化-动态库实战</a></p>
+
+<ol>
+<li>Objective-C 是C 的 “超集”，所以C 语言中的所有功能在编写Objective-C 代码时依然适用。</li>
+</ol>
+
+<p>超集的意思大概就像爸爸跟儿子的区别：S1 就是 S2 的超集，S2 有的 S1 都有。</p>
+
+<p><img src="http://7xnp79.com1.z0.glb.clouddn.com/64380cd7912397dd663433635f82b2b7d0a2870c.png" alt=""></p>
+
+<ol>
+<li>C 语言的内存模型（memory medel ），对象所占的内存总是分配在 “堆空间”（heap space）中，而绝不会分配在 “栈”（stack）上，不能在栈上面分配Objective-C 对象。</li>
+</ol>
+
+<p>分配在堆中的内存必须直接管理，而分配在栈上用于保存变量的内存则会在其栈帧弹出时自动清理，Objective-C 将堆内存管理抽象出来了，不需要用malloc 及free 来分配或释放对象所占内存，Objective-C 运行期环境把这部分工作抽象成一套内存管理架构，叫 ”引用计数“ 。</p>
+
+<p><a href="http://blog.csdn.net/anyaas/article/details/17099377">C语言内存模型及运行时内存布局</a></p>
+
+<ol>
+<li>对于创建结构体相比，创建对象需要额外的开销，例如分配及释放堆内存等操作，所以Objective-C 对于 ”非对象类型“ 通常都是适用结构体来存储，储存在栈空间。</li>
+</ol>
+
+<p>​</p>
+
+<blockquote>
+<ul>
+<li>Objective-C 为C 语言添加了面向对象特性，是其超集。Objective-C 使用动态绑定的消息结构，也就是说，在运行时才会检查对象类型。接收一条消息之后，究竟应执行何种代码，由运行期环境而非编译器来决定。</li>
+<li>理解C 语言的核心概念有助于写好Objective-C 程序。尤其要掌握内存模型与指针。</li>
+</ul>
+</blockquote>
+
+<h3>第 2 条：在类的头文件中尽量少引用其他头文件</h3>
+
+<ol>
+<li><p>Objective-C  标准编写类方式也是头文件、实现文件组成</p></li>
+<li><p>场景：A 类的头文件中有一个B 类型的属性</p></li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   @property (nonatomic,strong) B *b;
+</code></pre></figure>
+<p>要通过编译，处理方式有3种：使用#import  #incudule  @class关键字</p>
+
+<ul>
+<li>使用#import #include 这个时候可以解决问题，但不够优雅，这里就要知道B 类的具体细节，这里会引用到B 类的具体实现，会增加编译时间</li>
+<li>使用@class关键字，@class关键字 “向前声明” 告诉你有这个类，具体定义不清楚，这里就不依赖B 类的信息，这里从另外一个角度来看，可以减少A、B 之间的耦合</li>
+</ul>
+
+<ol>
+<li>两个类互相引用的问题： A 类中有B 类的属性，B 类中也有A 类的属性</li>
+</ol>
+
+<ul>
+<li>首先说明 #import 是由gcc 编译器支持的，其实就是 #incudule 改良版本；#import 确保了引用的这个文件只被引进一次，而#incudule 就会出现死循环引用，导致程序报错；</li>
+<li>这里使用 #import、#incudule 都不能解决这个循环问题，这里只能使用@class 来破解</li>
+</ul>
+
+<ol>
+<li>所以应该将引入头文件的时机尽量延后，只有确有需要的时候才引用，这样子可以减少类的使用者所需引用的头文件数量。</li>
+</ol>
+
+<ul>
+<li><p>使用@class 可以减少.h中对其他类的依赖、减少链接到其他类所需要的时间，从而降低编译时间。</p></li>
+<li><p>一般来说在.h中，首选@class 然后在迫不得已的时候才用#import (继承，实现协议)，对于协议来说 可以使用类扩展，在.m中声明一个匿名类别来声明，只有在子类需要统一实现这个协议的时候才会放在.h中，暂时没有了解到其他情况得非在.h中#import协议。</p>
+
+<p>​</p></li>
+</ul>
+
+<blockquote>
+<ul>
+<li>除非确有必要，否则不要引入头文件。一般来说，应在某个类的头文件中使用向前声明来提及别的类，并在实现文件中引入那些类的头文件。这样子可以尽量降低类之间的耦合（coupling）。</li>
+<li>有时无法使用向前声明，比如要声明某个类遵循一项协议。这种情况下，尽量把 “该类遵循某协议” 的这样声明移至 “class-continuation 分类中” 中。如果不行的话，就把协议单独放在一个头文件，然后将其引入。</li>
+<li>“class-continuation 分类”，其实就是一个特殊的分类，写在实现文件中的分类，只能被该实现文件所引用</li>
+</ul>
+</blockquote>
+
+<h3>第 3 条：多用字面量语法，少用与之等价的方法</h3>
+
+<ol>
+<li><p>使用字面量语法可以缩减源代码长度，使其更加易读，减少代码出错机率。字面量语法实际是一种 “语法糖”，也称 “糖衣语法”，是指计算机语言中与另外一套语法等效但是开发者用起来却更加方便的语法。</p></li>
+<li><p>字面数值</p></li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   NSNumber *someNumner = @1;
+   NSNumber *intNumner = @1;
+   NSNumber *floatNumner = @2.5f;
+   NSNumber *doubleNumner = @3.14159;
+   NSNumber *charNumner = @&#39;s&#39;;
+</code></pre></figure>
+<ol>
+<li>字面量数组</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   NSArray *array = @[@&quot;a&quot;,@&quot;b&quot;@&quot;c&quot;];
+   NSString *string = array[0];
+</code></pre></figure>
+<ol>
+<li>字面量字典</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   NSDictionary *dict = @{@&quot;key&quot;:@&quot;value&quot;};
+   NSString *string = dict[@&quot;key&quot;];
+</code></pre></figure>
+<ol>
+<li>可变数组与字典</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   NSMutableArray *mutable = [@[@&quot;a&quot;,@&quot;b&quot;] mutableCopt];
+</code></pre></figure>
+<ol>
+<li>局限性</li>
+</ol>
+
+<p>字面量所创建的对象必须属于Foundation 框架，如果自定义这些类的子类，则无法用字面量语法创建其对象。</p>
+
+<ol>
+<li>字符串字面量创建的是常量，对象不在持有了也不会立马被释放</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   例子：
+
+   __strong NSObject *yourObject= [NSObject new];
+   __weak NSObject *myObject = yourObject;
+   yourObject = nil;
+   __unsafe_unretained NSObject *theirObject = myObject;
+   NSLog(@&quot;%p %@&quot;, yourObject, yourObject);
+   NSLog(@&quot;%p %@&quot;, myObject, myObject);
+   NSLog(@&quot;%p %@&quot;, theirObject, theirObject);
+
+   2017-02-16 11:02:37.702543 TKApp[1767:599122] 0x0 (null)
+   2017-02-16 11:02:38.612380 TKApp[1767:599122] 0x0 (null)
+   2017-02-16 11:02:40.985613 TKApp[1767:599122] 0x0 (null)
+
+
+   __strong NSString *yourString = @&quot;Your String&quot;; 
+   __weak NSString *myString = yourString;
+   yourString = nil;
+   __unsafe_unretained NSString *theirString = myString;
+   NSLog(@&quot;%p %@&quot;, yourString, yourString);
+   NSLog(@&quot;%p %@&quot;, myString, myString);
+   NSLog(@&quot;%p %@&quot;, theirString, theirString);
+
+   2017-02-16 11:00:42.407410 TKApp[1757:597837] 0x0 (null)
+   2017-02-16 11:00:44.340836 TKApp[1757:597837] 0x1013b9480 Your String
+   2017-02-16 11:00:45.392346 TKApp[1757:597837] 0x1013b9480 Your String
+
+   这里主要有2个知识点：
+   1.关于ARC中的引用计数问题
+   2.字符串常量和字符串字面量的区别是什么？
+
+   Line By Line
+   第一种情况：
+   __strong NSObject *yourObject = [NSObject new];
+   yourObject New了一个NSObject对象 并且持有 对象引用计数＋1
+
+   __weak NSObject *myObject = yourObject;
+   myObject 指向 yourObject指向的的对象地址 没有持有 对象引用计数 不变
+
+   yourObject = nil;
+   yourObject 指向nil 不持有NSObject对象 对象不被持用 引用计数－1 这个时候这个对象自动释放
+
+   __unsafe_unretained NSObject *theirObject = myObject;
+   这个时候myObject已经被置为nil了 所以theirObject也为nil
+
+   第二种情况：
+   本来第二种情况也应该类似像第一种，这里就是关于字符串常量和字符串字面量的区别了。
+
+   What&#39;s the difference between a string constant and a string literal?
+
+   在这里为什么没有释放的情况跟字符串常量没什么联系，主要是这里是一个字符串字面量，字符串字面值创建了不会再修改了，一个对象持有这个字符串，当它不指向它了，也不会立马释放。
+   这里还有个点，Objective-C 会做字符串的编译单元，而且会合并相同字符串的编译单元，来减少额外的消耗去链接这些编译单元。
+
+   NSString *string1 = @“pengxuyuan”;
+   NSString *string2 = @“pengxuyuan”;
+
+   string1跟string2内存地址是一样的。
+</code></pre></figure>
+<p>参考资料：</p>
+
+<p><a href="http://stackoverflow.com/questions/25746/whats-the-difference-between-a-string-constant-and-a-string-literal">What&#39;s the difference between a string constant and a string literal?</a></p>
+
+<p><a href="http://stackoverflow.com/questions/10922888/weak-nsstring-variable-is-not-nil-after-setting-the-only-strong-reference-to-nil">Weak NSString variable is not nil after setting the only strong reference to nil</a></p>
+
+<p>​</p>
+
+<blockquote>
+<ul>
+<li>应该使用字面量语法来创建字符串、数值、数组、字典。与创建此类对象的常规方法相比，这么做更加简明扼要。</li>
+<li>应该通过取下标操作来访问数组下标或字典中的健所对应的元素。</li>
+<li>用字面量语法创建数组或字典时，若值中有nil，则会抛出异常。因此，务必确保值里不含nil。</li>
+</ul>
+</blockquote>
+
+<h3>第 4 条：多用类型常量，少用#define 预处理指令</h3>
+
+<ol>
+<li>在编码时候多次用到一个变量（数值，字符串等），我们会进行抽取以便修改一处所有用到的地方都会生效。</li>
+</ol>
+
+<p>我们可能会使用#define 预处理指令<code>#define ANIMATION_DURATION 0.3</code> 编译的时候会将遇到的ANIMATION_DURATION 替换成0.3，这样子可以解决问题，但是会存在一些问题：</p>
+
+<ul>
+<li>预处理指令是没有包含类型的，有可能会将一些不需替换的也替换掉，导致异常</li>
+<li>还有如果这个预处理被定义在头文件的话，引入了这个头文件的ANIMATION_DURATION 都会被替换，这是我们不希望看到的</li>
+</ul>
+
+<p>这个时候我们定义一个常量的话，就可以包含类型信息<code>static const NSTimerInterval kAnimationDuration = 0.3;</code>  这样子在编译的过程中就可以清楚的知道要替换的类型，如果不一致会报警告，这样子也方便排查问题；常用的命名法是：若常量局限于 “编译单元”（translation-unit，也就是 “实现文件” 中），则在前面加字母k；若常量在类之外可见，则通常已类名作为前缀。</p>
+
+<ol>
+<li>定义常量的位置很重要。</li>
+</ol>
+
+<p>如果将<code>#define ANIMATION_DURATION 0.3</code>  <code>static const NSTimerInterval kAnimationDuration = 0.3;</code>  定义在头文件，引入了这个头文件都会有这个名字，而且  <code>static const NSTimerInterval kAnimationDuration = 0.3;</code>  定义在头文件的话，等于会声明一个全局变量，这样子所有类都可以使用了，这样子我们应该用类型作为前缀。</p>
+
+<ol>
+<li><p>static 修饰符则意味该变量仅在此变量的编译单元可见。编译器每收到一个编译单元，就会输出一份 “目标文件”（object file）。在Objective-C 的语境下，”编译单元“ 通常指每个类的实现文件（.m 文件），如果声明此变量不加static，则编译器会为它创建一个 “外部符号”（external symbol），如果其他编译单元也声明同样的变量就会报错了。</p></li>
+<li><p>如果用static 和 const 声明一个变量，不会创建符号，而是会像#define 预处理指令一样，将遇到的变量全部替换，但是区别在这样子有变量类型。</p></li>
+<li><p>如果要定义一个外界可见的常量变量（constant variable），可以放在 “全局符号表”（global symbol table）中，来全局使用。</p></li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   //In the header file
+   extern NSString *const EOCStringConstant;
+
+   //In the implementtation file
+   NSString *const EOCStringConstant = @&quot;VALUE&quot;
+</code></pre></figure>
+<p>编译器会在 “数据段”（data section）为字符串分配存储空间，这里在上面C 语言的内存模型有讲，数据段通常是指用来存放程序中已初始化的全局变量的一块内存区域。数据段属于静态内存分配。 </p>
+
+<p>​</p>
+
+<blockquote>
+<ul>
+<li>不要用预处理指令定义常量。这样定义出来的常量不含类型信息，编译器只是会在编译前据此执行查找与替换操作。即使有人重新定义了常量值，编译器也不会产生警告信息，这将导致应用程序中的常量值不一致。</li>
+<li>在实现文件中使用static const 来定义 “只在编译单元内可见的常量“（translation-unitspecific constant）。由于此类常量不在全局符号表中，所以无须为其名称加前缀。</li>
+<li>在头文件中使用extern 来声明全局变量，并在相关实现文件中定义其值。这种常量要出现在全局符号表中，所以其名称应加以区隔，通常用与之相关的类型做前缀</li>
+</ul>
+</blockquote>
+
+<h3>第 5 条：用枚举表示状态、选项、状态码</h3>
+
+<ol>
+<li><p>C++ 11 标准扩充了枚举的特性，最新系统框架使用了 “强类型”（strong type）的枚举。</p></li>
+<li><p>实现枚举所用的数据类型取决于编译器，不过其二进制位（bit）的个数必须能完全表示下枚举编号才行，一个字节含8个二进制位，所以至多能表示256中（2<sup>8<sup>个）枚举（编号为0～255）的枚举变量。</sup></sup></p></li>
+<li><p>只要枚举定义得对，各选项之间就可通过 “按位或操作符”（bitwise OR operator）来组合。</p></li>
+<li><p>用宏来定义枚举类型，这些宏具备向后兼容（backward compatibility）能力，如果目标平台编译器支持新标准，那就使用新式语法，否则改用旧式语法。</p></li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   typedef NS_ENUM(NSUInterger,EOCConnectionState) {
+    EOCConnectionStateDisconnected,
+    EOCConnectionStateConnecting,
+    EOCConnectionStateConnected,
+   };
+
+   typedef NS_OPTINS (NSUInterger,EOCPermittedDirection) {
+        EOCPermittedDirectionUp     = 1 &lt;&lt; 0,
+       EOCPermittedDirectionDown    = 1 &lt;&lt; 1,
+       EOCPermittedDirectionLeft    = 1 &lt;&lt; 2,
+       EOCPermittedDirectionRight   = 1 &lt;&lt; 3,
+   }
+</code></pre></figure>
+<ol>
+<li>在switch 语句中，最好不要有default 分支，这样子要做到处理所有样式，这样子在新家类型的时候，没有default 编译器会发出警告，让我们注意到。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>应该用枚举来表示状态机的状态、传递给方法的选项以及状态码等值，给这些值起个易懂的名字。</li>
+<li>如果把传递给某个方法的选项表示为枚举类型，而多个选项又可同时使用，那么就将各选项值定义为2的幂，以便通过按位或操作将其组合起来。</li>
+<li>用NS_ENUM 与 NS_OPTIONS 宏来定义枚举类型，并指明其底层数据类型。这样做可以确保枚举是用开发者所选的底层数据类型实现的，而不会才用编译器所选的类型。</li>
+<li>在处理枚举类型的switch 语句中不要实现defauly 分支。这样的话，加入新枚举之后，编译器就会提示开发者：switch 语句并未处理所有枚举。</li>
+</ul>
+</blockquote>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/04/iOS-Security-translate/" title="link to iOS Security 安全白皮书（一）">iOS Security 安全白皮书（一）</a></h2>
+       <p class="excerpt">[TOC]前言iOS 安全白皮书是苹果官方提供的，里面有苹果对于安全设计的一些细节介绍，阅读可以更佳理解苹果系统的构造，虽然不能说是看了能很深的明白其设计思路，但是可以增加知识，为以后做安全方面打下基础官方原文地址  这个是官方的文档，英文好的同学强烈建议看原文档，个人经验来说，看英文跟看中文完全是两种不同的体验，但是看英文会更加有趣更加深刻17年白皮书翻译，我是看到巧神推荐才知道有iOS 安全白皮书的，以前对于白皮书的概念还是高中的练习辅导呢，那时候上网找了下有没中文文档，很遗憾没有找到...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-04-24 00:00:00 +0800" class="post-list__meta--date date">2017-04-24</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/04/iOS-Security-translate/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div class="ds-thread" data-thread-key="/2017/04/Effective-Objective-C-2.0-one/" data-title="Effective Objective-C 2.0 总结（一）" data-url="http://pengxuyuan.github.io/2017/04/Effective-Objective-C-2.0-one/"></div>
+    <script type="text/javascript">
+        var duoshuoQuery = {short_name:"pengxuyuan"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+  
+  
+  
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-04-26 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站由 <a href="http://pengxuyuan.github.io">@彭序猿</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+
+  </body>
+
+</html>
