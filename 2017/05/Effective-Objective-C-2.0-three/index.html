@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Effective Objective-C 2.0 总结（三）</title>
+  <meta name="description" content="接口与 API 设计">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Effective Objective-C 2.0 总结（三）">
+  <meta name="twitter:description" content="接口与 API 设计">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Effective Objective-C 2.0 总结（三）">
+  <meta property="og:description" content="接口与 API 设计">
+
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://pengxuyuan.github.io/2017/05/Effective-Objective-C-2.0-three/">
+  <link rel="alternate" type="application/rss+xml" title="彭序猿" href="http://pengxuyuan.github.io/feed.xml">
+
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+  <!-- Hit Kounter -->
+  <script src="http://hitk.applinzi.com/scripts/dst/hit-kounter.js"></script>
+  <script src="https://cdn1.lncld.net/static/js/av-mini-0.6.10.js"></script>
+  <script src="http://jerry-cdn.b0.upaiyun.com/hit-kounter/hit-kounter-lc-0.2.0.js"></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 彭序猿 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="彭序猿 logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 彭序猿" class="blog-button">彭序猿</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">耕读传家，学为好人</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        <p class="panel-cover__description">我们做技术的，不会耍什么心眼，从来都是你看我顺眼，我看你顺眼，那我们就是好基友～</p>
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">博客</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/pengguang9412197045" title="@pengguang9412197045 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/pengxuyuan" title="@pengxuyuan 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:451946155@qq.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-slate"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-05-17 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2017-05-17</time> &#8226; <span class="post-meta__tags tags"></span>
+      <span class="post-meta__date date">浏览量：<span data-hk-page="current"> - </span> 次<span class="post-meta__date date"></span></span>
+    </div>
+    <h1 class="post-title">Effective Objective-C 2.0 总结（三）</h1>
+  </header>
+
+  <section class="post">
+    <h2>接口与 API 设计</h2>
+
+<p>[TOC]</p>
+
+<h3>第 15 条：用前缀避免命名空间冲突</h3>
+
+<ol>
+<li>如果发生命名冲突（naming clash），那么应用程序的链接过程就会出错，因为出现了重复符号。</li>
+<li>应该为所有名称都加上适当的前缀，最好是三个字母以上做前缀，因为苹果宣称其保留使用所有 “两字母前缀”。</li>
+<li>在类的实现文件所有的纯C 函数及全局变量，也是容易命名冲突的，在编译好的目标文件中，这些要算做 “顶级符号”（top-level symbol）。</li>
+<li>如果自己的代码准备再发布为程序供他人开发应用程序所用，自己的代码以及自己引用到的第三方库都是要加前缀的，避免在未来冲突。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>选择与你的公司、应用程序或两者皆有关联之名称作为类名的前缀，并在所有代码中均使用这一前缀。</li>
+<li>若自己所开发的程序库中用到了第三方库，则应为其中的名称加上前缀。</li>
+</ul>
+</blockquote>
+
+<h3>第 16 条：提供 “全能初始化方法”</h3>
+
+<ol>
+<li>“全能初始化方法”（designated initializer）：为对象提供必要信息以便其能完成工作的初始化方法。</li>
+<li>每个子类的全能初始化方法都应该调用其超类的对应方法，并逐层向上。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>在类中提供一个全能初始化方法，并于文档里指明。其他初始化方法均应调用此方法。</li>
+<li>若全能初始化方法与超类不同，则需覆写超类中的对应方法。</li>
+<li>如果超类的初始化方法不适用于子类，那么应该覆写这个超类方法，并在其中抛出异常。</li>
+</ul>
+</blockquote>
+
+<h3>第 17 条：实现 description 方法</h3>
+
+<ol>
+<li>在调用<code>NSLog(@&quot;object = %@&quot;,onbject);</code> 其实是调用了对象的description 方法。</li>
+<li>在我们自定义类中，这样子打印输出信息有可能是这种<code>object = &lt;EOCPerson: 0x7hh9j22238800&gt;</code>  ，这个我们需要重写description 方法，让它返回我们需要的一些信息。</li>
+<li>description 定义在NSObject 协议里面，因为NSObject 不是唯一的 “根类”，用继承不能很好的让其他类有这个方法，例如：NSProxy 也是遵从了NSObject 协议的 “根类”。</li>
+<li>小技巧：可以在description 中用NSDictionary 的description 方法来输出，就是将信息用字典的形式来展示，这样子更加直观，也更加容易扩展。</li>
+<li>debugDescription 方法是开发者在调试器中以控制台命令打印对象时才调用的，默认是直接调用description 方法。<code>po object;</code> </li>
+</ol>
+
+<blockquote>
+<ul>
+<li>实现 description 方法返回一个有意义的字符串，用以描述该实例。</li>
+<li>若想在调试时打印出更详尽的对象描述信息，则应实现debugDescription 方法。</li>
+</ul>
+</blockquote>
+
+<h3>第 18 条：尽量使用不可变对象</h3>
+
+<ol>
+<li>设计类的时候，用属性来封装数据，在用属性的时候，可将其声明为 “只读” ，避免外部不必要的修改（PS：如果把可变对象放到collection 之后又修改其内容，很容易会破坏set 的内部数据结构，使其失去固有的语义）。</li>
+<li>尽量把对外公布出来的属性设为只读，而且只在确有必要时才将属性对外公布。</li>
+<li>当我们想外部暴露只读属性、内部需要修改属性，这样子通常是在内部将readonly 属性重新声明为readwrite。但是如果该属性是nonatomic 的，这样子做可能会产生 “竞争条件”（rece condition）。在对象内部写入某属性时，对象外的观察者也许正在读取该属性。若想避免此问题，我们可以在必要时通过 “派发队列”（dispatch queue）等手段，将所有的数据存取操作都设为同步操作。</li>
+<li>虽然属性对外设置成readonly 了，但是外部仍能通过 “键值编码”（Key-Value Coding，KVC）技术设置这些属性值。<code>[object setValue:@&quot;abc&quot; forKey:@&quot;name&quot;]</code> ，这样子可以修改name 这个属性，KVC 会在类中查找 “setName：” 方法来修改属性值。</li>
+<li>还可以通过类型信息查询功能，查出属性所对应的实例变量在内存中的偏移量，从此来人为设置这个实例变量的值。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>尽量创建不可变的对象。</li>
+<li>若某属性仅可于对象内部修改，则在 “class-continuation 分类” 中将其由readonly 属性扩展成readwrite 属性。</li>
+<li>不要把可变的collection 作为属性公开，而应提供相关方法，以此修改对象中的可变collection。</li>
+</ul>
+</blockquote>
+
+<h3>第 19 条：使用清晰而协调的命名方式</h3>
+
+<p>方法和变量名使用 “驼峰式大小写命名法”：以小写字母开头，其后每个单词首字母大写。类名也采用驼峰式命名法，不过其首字母需要大写，通常还会加两三个前缀字母。</p>
+
+<p><strong>方法命名</strong></p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">- (id)initWithWidth:(float)width andHeight:(float)height;
+</code></pre></figure>
+<ol>
+<li>把方法名起的稍微长一点，可以保证其能准确传达出方法所执行的任务，但是也不能累赘，尽量言简意赅。</li>
+<li>清晰的方法名从左至右读起来好似一篇文章，易于维护，他人也更加易懂。</li>
+<li>NSString 这个类就展示了一套良好的命名习惯，可以去查看下头文件。</li>
+<li>给方法命名总结：
+
+<ul>
+<li>如果方法的返回值是新创建的，那么方法名的首个词应该是返回值的类型，除非前面还有修饰语，例如localizedString。属性的存取方法不遵循这种命名方式，因为一般认为这些方法不会创建新对象，即便有时返回内部对象的一份拷贝，我们也认为那相当于原有的对象。这些存取方法应该按照其所对应的属性来命名。</li>
+<li>应该把表示参数类型的名词放在参数前面。</li>
+<li>如果方法要在当前对象上执行操作，那么就应该包含动词；若执行操作时还需要参数，则应该在动词后面加上一个或多个名字。</li>
+<li>不要使用str 这种简称，应该使用string 这样的全称。</li>
+<li>Boolean 属性应加is 前缀。如果某方法返回非属性的Boolean 值，那么应该根据其功能，选用has 或is 当前缀。</li>
+<li>将get 这个前缀留给那些借由 ”输出参数“ 来保存返回值的方法，比如说，把返回值填充到 ”C语言式数组“ 里的那种方法就可以使用这个词做前缀。</li>
+</ul></li>
+</ol>
+
+<p><strong>类与协议的命名</strong></p>
+
+<ol>
+<li>应该为类与协议的名称加上前缀，以避免命名空间冲突。</li>
+<li>命名应该协调一致，从其他框架继承子类，务必遵循其命名惯例。UIView 子类末尾必须是View，委托协议末尾必须是Delegate。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>起名时应遵从标准的Objective-C 命名规范，这样子创建出来的接口更容易为开发者所理解。</li>
+<li>方法名要言简意赅，从左至右读起来要像个日常用语中的句子才好。</li>
+<li>方法名里不要使用缩略后的类型名称。</li>
+<li>给方法起名时第一要务就是确保其风格与你自己的代码或所有集成的框架相符。</li>
+</ul>
+</blockquote>
+
+<h3>第 20 条：为私有方法名加前缀</h3>
+
+<ol>
+<li>便于区分公共方法跟私有方法。</li>
+<li>前缀根据个人喜好定，目前发现很多第三方库也很少使用这个私有方法名加前缀，这个就看个人喜好吧。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>给私有方法的名称加上前缀，这样可以很容易地将其同公共方法区分开。</li>
+<li>不要单用一个下划线做私有方法的前缀，因为这种做法是预留给苹果公司用的。</li>
+</ul>
+</blockquote>
+
+<h3>第 21 条：理解Objective-C 错误模型</h3>
+
+<ol>
+<li><p>ARC 默认不是 “异常安全的”，如果抛出异常，那么应在作用域末尾释放的对象现在却不会自动释放了。想要生成 “异常安全的” 代码，可以设置编译器的标志来实现 “-fobjc-arc-exceptions”。</p></li>
+<li><p>平常很难写出在抛出异常时不会导致内存泄漏的代码，Objective-C 语言现在采用的办法是：只在极其罕见的情况下抛出异常，抛出异常应用程序直接退出，不考虑修复问题，不用再写复杂的 “异常安全” 代码。</p></li>
+<li><p>在 “不那么严重的错误”，令方法返回nil/0,或者是使用NSError，表明其中有错误发生。</p></li>
+<li><p>NSError 可以经由此对象，把导致错误的原因回报给调用者。</p></li>
+</ol>
+
+<ul>
+<li>Error domain 错误范围，其类型为字符串</li>
+<li>Error code 错误码，其类型为整数</li>
+<li>User info 用户信息，其类型为字典</li>
+</ul>
+
+<ol>
+<li>第一种常见用法是：通过委托协议来传递此错误</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">     - (void) connection:(NSURLConnection *)connection
+         didFailWithError:(NSError *)error;
+</code></pre></figure>
+<ol>
+<li>另外一种常见的方法是：经由方法的 “输出参数” 返回给调用者</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   //定义
+   - (BOOL) doSomething:(NSError **)error;
+
+   //用法
+   NSError *error = nil;
+   BOOL ret = [objecr doSomething:&amp;error]
+   if(ret){
+    //to do
+   }
+
+   //具体实现
+   - (BOOL) doSomething:(NSError **)error {
+     if(/*there was an error*/){
+      if(error){
+            *error = [NSError errorWithDomain:domain
+                                     code:code
+                                 userInfo:userInfo];
+            return NO;
+        }
+     }else{
+        return YES;
+     }
+   }
+
+   //这个*error 语法会为error 参数“解引用”（dereference），也就是说，error 所指的那个指针现在要指向新的NSError 对象，所以这里要确保error 参数不是nil。
+</code></pre></figure>
+<p>传递给方法的参数是个指针，而该指针的又指向另外一个指针，那个指针指向NSError 对象（指向NSError 对象的指针）。这样子，此方法不仅能有普通的返回值，还可以经由 “输出参数” 把NSError 对象回传给调用者。    </p>
+
+<ol>
+<li>使用ARC 时，编译器会吧NSError** 转换成NSError * _ _autorelease*， 也就是说指针所指的对象会在方法执行完毕后自动释放。这个对象必须自动释放，因为 “doSomething：” 方法不能保证调用者可以把此方法中创建的NSError 释放掉，所以必须加入autorelease。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>只有发生了可使整个应用程序崩溃的严重错误时，才应使用异常。</li>
+<li>在错误不那么严重的情况下，可以指派 “委托方法”（delegate method）来处理错误，也可以把错误信息放在NSError 对象里，经由 “输出参数” 返回给调用者。</li>
+</ul>
+</blockquote>
+
+<h3>第 22 条：理解NSCopying 协议</h3>
+
+<ol>
+<li>使用对象经常需要拷贝它，此操作通过copy 方法完成。如果想令自己的类支持拷贝操作，那就实现NSCopying 协议，该协议只有一个方法：</li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   - (id)copyWithZone:(NSZone *)zone
+</code></pre></figure>
+<ol>
+<li><p>以前开发程序，会把内存分成不同的 “区”（zone），而对象会创建在不同区里面，现在不用了，每个程序只有一个区：“默认区”（default zone）。</p></li>
+<li><p>NSMutableCopying 协议跟NSCopying 类似，也只有一个方法：</p></li>
+</ol>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   - (id)mutableCopyWithZone:(NSZone *)zone 
+</code></pre></figure>
+<ol>
+<li><p>如果你的类分可变版本与不可变版本，这两个协议你都应该实现。</p></li>
+<li><p>注意：在可变对象上调用copy 方法返回另外一个不可变类的实例。</p></li>
+<li><p>在编写拷贝方法时，还要确定一个问题：应该执行 “深拷贝”（deep copy）还是 “浅拷贝”（shallow copy）。</p></li>
+<li><p>深拷贝是指在拷贝对象自身时，将其底层的数据也一并复制过去；浅拷贝只对拷贝对象的指针，并不会拷贝底层的数据。Foundation 框架中的所有collection 类默认都执行浅拷贝。</p></li>
+<li><p>没有专门定义深拷贝的协议，所以具体执行方式由每个类来确定。另外不要假设遵从了NSCopying 协议的对象都会执行深拷贝。绝大多数情况下，执行的都是浅拷贝。</p></li>
+</ol>
+
+<blockquote>
+<ul>
+<li>若想令自己所写的对象具备拷贝功能，则需实现NSCopying 协议。</li>
+<li>如果自定义的对象分为可变版本与不可变版本，那么就要同时实现NSCopying 与 NSMutableCopying 协议。</li>
+<li>复制对象时需决定采用浅拷贝还是深拷贝，一般情况下应该尽量执行浅拷贝。</li>
+<li>如果你所写的对象需要深拷贝，那么可以考虑新增一个专门执行深拷贝的方法。</li>
+</ul>
+</blockquote>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/05/Effective-Objective-C-2.0-two/" title="link to Effective Objective-C 2.0 总结（二）">Effective Objective-C 2.0 总结（二）</a></h2>
+       <p class="excerpt">对象、消息、运行期第 6 条：理解 “属性” 这一概念“对象”（object）就是 “基本构造单元”（building block），开发者可以通过对象来存储并传递数据，在对象直接传递数据并执行任务的过程就叫做 “消息传递”（Messaging）。如果对象布局在编译器就固定了，访问变量时，编译器会使用 “偏移量”（offset）来计算，这个偏移量是 “硬编码”（hardcode），表示该变量距离存放对象的内存区域的起始地址有多远。 存在一个问题：如果代码使用了编译期计算出来的偏移量，那么修...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-05-08 00:00:00 +0800" class="post-list__meta--date date">2017-05-08</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/05/Effective-Objective-C-2.0-two/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div class="ds-thread" data-thread-key="/2017/05/Effective-Objective-C-2.0-three/" data-title="Effective Objective-C 2.0 总结（三）" data-url="http://pengxuyuan.github.io/2017/05/Effective-Objective-C-2.0-three/"></div>
+    <script type="text/javascript">
+        var duoshuoQuery = {short_name:"pengxuyuan"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+  
+  
+  
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-05-17 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站由 <a href="http://pengxuyuan.github.io">@彭序猿</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+
+  </body>
+
+</html>

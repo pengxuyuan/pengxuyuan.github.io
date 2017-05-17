@@ -5,9 +5,234 @@
     <description>你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</description>
     <link>http://pengxuyuan.github.io/</link>
     <atom:link href="http://pengxuyuan.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 08 May 2017 14:53:35 +0800</pubDate>
-    <lastBuildDate>Mon, 08 May 2017 14:53:35 +0800</lastBuildDate>
+    <pubDate>Wed, 17 May 2017 10:07:44 +0800</pubDate>
+    <lastBuildDate>Wed, 17 May 2017 10:07:44 +0800</lastBuildDate>
     <generator>Jekyll v3.1.1</generator>
+    
+      <item>
+        <title>Effective Objective-C 2.0 总结（三）</title>
+        <description>&lt;h2&gt;接口与 API 设计&lt;/h2&gt;
+
+&lt;p&gt;[TOC]&lt;/p&gt;
+
+&lt;h3&gt;第 15 条：用前缀避免命名空间冲突&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;如果发生命名冲突（naming clash），那么应用程序的链接过程就会出错，因为出现了重复符号。&lt;/li&gt;
+&lt;li&gt;应该为所有名称都加上适当的前缀，最好是三个字母以上做前缀，因为苹果宣称其保留使用所有 “两字母前缀”。&lt;/li&gt;
+&lt;li&gt;在类的实现文件所有的纯C 函数及全局变量，也是容易命名冲突的，在编译好的目标文件中，这些要算做 “顶级符号”（top-level symbol）。&lt;/li&gt;
+&lt;li&gt;如果自己的代码准备再发布为程序供他人开发应用程序所用，自己的代码以及自己引用到的第三方库都是要加前缀的，避免在未来冲突。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;选择与你的公司、应用程序或两者皆有关联之名称作为类名的前缀，并在所有代码中均使用这一前缀。&lt;/li&gt;
+&lt;li&gt;若自己所开发的程序库中用到了第三方库，则应为其中的名称加上前缀。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 16 条：提供 “全能初始化方法”&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;“全能初始化方法”（designated initializer）：为对象提供必要信息以便其能完成工作的初始化方法。&lt;/li&gt;
+&lt;li&gt;每个子类的全能初始化方法都应该调用其超类的对应方法，并逐层向上。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;在类中提供一个全能初始化方法，并于文档里指明。其他初始化方法均应调用此方法。&lt;/li&gt;
+&lt;li&gt;若全能初始化方法与超类不同，则需覆写超类中的对应方法。&lt;/li&gt;
+&lt;li&gt;如果超类的初始化方法不适用于子类，那么应该覆写这个超类方法，并在其中抛出异常。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 17 条：实现 description 方法&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在调用&lt;code&gt;NSLog(@&amp;quot;object = %@&amp;quot;,onbject);&lt;/code&gt; 其实是调用了对象的description 方法。&lt;/li&gt;
+&lt;li&gt;在我们自定义类中，这样子打印输出信息有可能是这种&lt;code&gt;object = &amp;lt;EOCPerson: 0x7hh9j22238800&amp;gt;&lt;/code&gt;  ，这个我们需要重写description 方法，让它返回我们需要的一些信息。&lt;/li&gt;
+&lt;li&gt;description 定义在NSObject 协议里面，因为NSObject 不是唯一的 “根类”，用继承不能很好的让其他类有这个方法，例如：NSProxy 也是遵从了NSObject 协议的 “根类”。&lt;/li&gt;
+&lt;li&gt;小技巧：可以在description 中用NSDictionary 的description 方法来输出，就是将信息用字典的形式来展示，这样子更加直观，也更加容易扩展。&lt;/li&gt;
+&lt;li&gt;debugDescription 方法是开发者在调试器中以控制台命令打印对象时才调用的，默认是直接调用description 方法。&lt;code&gt;po object;&lt;/code&gt; &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;实现 description 方法返回一个有意义的字符串，用以描述该实例。&lt;/li&gt;
+&lt;li&gt;若想在调试时打印出更详尽的对象描述信息，则应实现debugDescription 方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 18 条：尽量使用不可变对象&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;设计类的时候，用属性来封装数据，在用属性的时候，可将其声明为 “只读” ，避免外部不必要的修改（PS：如果把可变对象放到collection 之后又修改其内容，很容易会破坏set 的内部数据结构，使其失去固有的语义）。&lt;/li&gt;
+&lt;li&gt;尽量把对外公布出来的属性设为只读，而且只在确有必要时才将属性对外公布。&lt;/li&gt;
+&lt;li&gt;当我们想外部暴露只读属性、内部需要修改属性，这样子通常是在内部将readonly 属性重新声明为readwrite。但是如果该属性是nonatomic 的，这样子做可能会产生 “竞争条件”（rece condition）。在对象内部写入某属性时，对象外的观察者也许正在读取该属性。若想避免此问题，我们可以在必要时通过 “派发队列”（dispatch queue）等手段，将所有的数据存取操作都设为同步操作。&lt;/li&gt;
+&lt;li&gt;虽然属性对外设置成readonly 了，但是外部仍能通过 “键值编码”（Key-Value Coding，KVC）技术设置这些属性值。&lt;code&gt;[object setValue:@&amp;quot;abc&amp;quot; forKey:@&amp;quot;name&amp;quot;]&lt;/code&gt; ，这样子可以修改name 这个属性，KVC 会在类中查找 “setName：” 方法来修改属性值。&lt;/li&gt;
+&lt;li&gt;还可以通过类型信息查询功能，查出属性所对应的实例变量在内存中的偏移量，从此来人为设置这个实例变量的值。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;尽量创建不可变的对象。&lt;/li&gt;
+&lt;li&gt;若某属性仅可于对象内部修改，则在 “class-continuation 分类” 中将其由readonly 属性扩展成readwrite 属性。&lt;/li&gt;
+&lt;li&gt;不要把可变的collection 作为属性公开，而应提供相关方法，以此修改对象中的可变collection。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 19 条：使用清晰而协调的命名方式&lt;/h3&gt;
+
+&lt;p&gt;方法和变量名使用 “驼峰式大小写命名法”：以小写字母开头，其后每个单词首字母大写。类名也采用驼峰式命名法，不过其首字母需要大写，通常还会加两三个前缀字母。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;方法命名&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;- (id)initWithWidth:(float)width andHeight:(float)height;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;把方法名起的稍微长一点，可以保证其能准确传达出方法所执行的任务，但是也不能累赘，尽量言简意赅。&lt;/li&gt;
+&lt;li&gt;清晰的方法名从左至右读起来好似一篇文章，易于维护，他人也更加易懂。&lt;/li&gt;
+&lt;li&gt;NSString 这个类就展示了一套良好的命名习惯，可以去查看下头文件。&lt;/li&gt;
+&lt;li&gt;给方法命名总结：
+
+&lt;ul&gt;
+&lt;li&gt;如果方法的返回值是新创建的，那么方法名的首个词应该是返回值的类型，除非前面还有修饰语，例如localizedString。属性的存取方法不遵循这种命名方式，因为一般认为这些方法不会创建新对象，即便有时返回内部对象的一份拷贝，我们也认为那相当于原有的对象。这些存取方法应该按照其所对应的属性来命名。&lt;/li&gt;
+&lt;li&gt;应该把表示参数类型的名词放在参数前面。&lt;/li&gt;
+&lt;li&gt;如果方法要在当前对象上执行操作，那么就应该包含动词；若执行操作时还需要参数，则应该在动词后面加上一个或多个名字。&lt;/li&gt;
+&lt;li&gt;不要使用str 这种简称，应该使用string 这样的全称。&lt;/li&gt;
+&lt;li&gt;Boolean 属性应加is 前缀。如果某方法返回非属性的Boolean 值，那么应该根据其功能，选用has 或is 当前缀。&lt;/li&gt;
+&lt;li&gt;将get 这个前缀留给那些借由 ”输出参数“ 来保存返回值的方法，比如说，把返回值填充到 ”C语言式数组“ 里的那种方法就可以使用这个词做前缀。&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;类与协议的命名&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;应该为类与协议的名称加上前缀，以避免命名空间冲突。&lt;/li&gt;
+&lt;li&gt;命名应该协调一致，从其他框架继承子类，务必遵循其命名惯例。UIView 子类末尾必须是View，委托协议末尾必须是Delegate。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;起名时应遵从标准的Objective-C 命名规范，这样子创建出来的接口更容易为开发者所理解。&lt;/li&gt;
+&lt;li&gt;方法名要言简意赅，从左至右读起来要像个日常用语中的句子才好。&lt;/li&gt;
+&lt;li&gt;方法名里不要使用缩略后的类型名称。&lt;/li&gt;
+&lt;li&gt;给方法起名时第一要务就是确保其风格与你自己的代码或所有集成的框架相符。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 20 条：为私有方法名加前缀&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;便于区分公共方法跟私有方法。&lt;/li&gt;
+&lt;li&gt;前缀根据个人喜好定，目前发现很多第三方库也很少使用这个私有方法名加前缀，这个就看个人喜好吧。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;给私有方法的名称加上前缀，这样可以很容易地将其同公共方法区分开。&lt;/li&gt;
+&lt;li&gt;不要单用一个下划线做私有方法的前缀，因为这种做法是预留给苹果公司用的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 21 条：理解Objective-C 错误模型&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;ARC 默认不是 “异常安全的”，如果抛出异常，那么应在作用域末尾释放的对象现在却不会自动释放了。想要生成 “异常安全的” 代码，可以设置编译器的标志来实现 “-fobjc-arc-exceptions”。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;平常很难写出在抛出异常时不会导致内存泄漏的代码，Objective-C 语言现在采用的办法是：只在极其罕见的情况下抛出异常，抛出异常应用程序直接退出，不考虑修复问题，不用再写复杂的 “异常安全” 代码。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;在 “不那么严重的错误”，令方法返回nil/0,或者是使用NSError，表明其中有错误发生。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;NSError 可以经由此对象，把导致错误的原因回报给调用者。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Error domain 错误范围，其类型为字符串&lt;/li&gt;
+&lt;li&gt;Error code 错误码，其类型为整数&lt;/li&gt;
+&lt;li&gt;User info 用户信息，其类型为字典&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+&lt;li&gt;第一种常见用法是：通过委托协议来传递此错误&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;     - (void) connection:(NSURLConnection *)connection
+         didFailWithError:(NSError *)error;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;另外一种常见的方法是：经由方法的 “输出参数” 返回给调用者&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   //定义
+   - (BOOL) doSomething:(NSError **)error;
+
+   //用法
+   NSError *error = nil;
+   BOOL ret = [objecr doSomething:&amp;amp;error]
+   if(ret){
+    //to do
+   }
+
+   //具体实现
+   - (BOOL) doSomething:(NSError **)error {
+     if(/*there was an error*/){
+      if(error){
+            *error = [NSError errorWithDomain:domain
+                                     code:code
+                                 userInfo:userInfo];
+            return NO;
+        }
+     }else{
+        return YES;
+     }
+   }
+
+   //这个*error 语法会为error 参数“解引用”（dereference），也就是说，error 所指的那个指针现在要指向新的NSError 对象，所以这里要确保error 参数不是nil。
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;传递给方法的参数是个指针，而该指针的又指向另外一个指针，那个指针指向NSError 对象（指向NSError 对象的指针）。这样子，此方法不仅能有普通的返回值，还可以经由 “输出参数” 把NSError 对象回传给调用者。    &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;使用ARC 时，编译器会吧NSError** 转换成NSError * _ _autorelease*， 也就是说指针所指的对象会在方法执行完毕后自动释放。这个对象必须自动释放，因为 “doSomething：” 方法不能保证调用者可以把此方法中创建的NSError 释放掉，所以必须加入autorelease。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;只有发生了可使整个应用程序崩溃的严重错误时，才应使用异常。&lt;/li&gt;
+&lt;li&gt;在错误不那么严重的情况下，可以指派 “委托方法”（delegate method）来处理错误，也可以把错误信息放在NSError 对象里，经由 “输出参数” 返回给调用者。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h3&gt;第 22 条：理解NSCopying 协议&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;使用对象经常需要拷贝它，此操作通过copy 方法完成。如果想令自己的类支持拷贝操作，那就实现NSCopying 协议，该协议只有一个方法：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   - (id)copyWithZone:(NSZone *)zone
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;以前开发程序，会把内存分成不同的 “区”（zone），而对象会创建在不同区里面，现在不用了，每个程序只有一个区：“默认区”（default zone）。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;NSMutableCopying 协议跟NSCopying 类似，也只有一个方法：&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-objective-c&quot; data-lang=&quot;objective-c&quot;&gt;   - (id)mutableCopyWithZone:(NSZone *)zone 
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;如果你的类分可变版本与不可变版本，这两个协议你都应该实现。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;注意：在可变对象上调用copy 方法返回另外一个不可变类的实例。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;在编写拷贝方法时，还要确定一个问题：应该执行 “深拷贝”（deep copy）还是 “浅拷贝”（shallow copy）。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;深拷贝是指在拷贝对象自身时，将其底层的数据也一并复制过去；浅拷贝只对拷贝对象的指针，并不会拷贝底层的数据。Foundation 框架中的所有collection 类默认都执行浅拷贝。&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;没有专门定义深拷贝的协议，所以具体执行方式由每个类来确定。另外不要假设遵从了NSCopying 协议的对象都会执行深拷贝。绝大多数情况下，执行的都是浅拷贝。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;若想令自己所写的对象具备拷贝功能，则需实现NSCopying 协议。&lt;/li&gt;
+&lt;li&gt;如果自定义的对象分为可变版本与不可变版本，那么就要同时实现NSCopying 与 NSMutableCopying 协议。&lt;/li&gt;
+&lt;li&gt;复制对象时需决定采用浅拷贝还是深拷贝，一般情况下应该尽量执行浅拷贝。&lt;/li&gt;
+&lt;li&gt;如果你所写的对象需要深拷贝，那么可以考虑新增一个专门执行深拷贝的方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Wed, 17 May 2017 00:00:00 +0800</pubDate>
+        <link>http://pengxuyuan.github.io/2017/05/Effective-Objective-C-2.0-three/</link>
+        <guid isPermaLink="true">http://pengxuyuan.github.io/2017/05/Effective-Objective-C-2.0-three/</guid>
+        
+        
+      </item>
     
       <item>
         <title>Effective Objective-C 2.0 总结（二）</title>
