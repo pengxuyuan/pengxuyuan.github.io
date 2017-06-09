@@ -127,6 +127,20 @@
   <ol class="post-list">
     
     <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/06/Effective-Objective-C-2.0-six/" title="访问 Effective Objective-C 2.0 总结（六）">Effective Objective-C 2.0 总结（六）</a></h2>
+      <p class="excerpt">块与大中枢派发第 37 条：理解 “块” 这一概念块可以实现闭包。块的基础知识块用 “” 符号来表示，后面跟着一对花括号，括号里面是块的实现代码。块其实就是个值，而且自有其相关类型，可以赋值给变量；块类型的语法和函数指针类似。   ^{    //block implementation herer       }   //这里定义了名为someBlock 的变量   //块类型的语法结构如下   //return_type (^block_name)(parameters)   void...&hellip;</p>
+      <div class="post-list__meta"><time datetime="2017-06-09 00:00:00 +0800" class="post-list__meta--date date">2017-06-09</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/06/Effective-Objective-C-2.0-six/>继续阅读</a></div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/06/Effective-Objective-C-2.0-seven/" title="访问 Effective Objective-C 2.0 总结（七）">Effective Objective-C 2.0 总结（七）</a></h2>
+      <p class="excerpt">系统框架第 47 条：熟悉系统框架框架：将一系列代码封装成动态库，并在其中放入描述其接口的头文件。平时我们第三方框架用的是静态库，因为iOS 应用程序不允许其中包含动态库。Foundation、CoreFoundation 框架平时用的比较多，“无缝桥接” 可以将这两种框架的对象平滑转换。还有很多系统库我们平时都应该尽量去用它们，而不是重新实现它们已经实现的功能：CFNetworkCoreAudioAVFoundationCoreDataCoreText许多系统框架都可以直接使用。其中最重...&hellip;</p>
+      <div class="post-list__meta"><time datetime="2017-06-09 00:00:00 +0800" class="post-list__meta--date date">2017-06-09</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/06/Effective-Objective-C-2.0-seven/>继续阅读</a></div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
       <h2 class="post-list__post-title post-title"><a href="/2017/05/Effective-Objective-C-2.0-five/" title="访问 Effective Objective-C 2.0 总结（五）">Effective Objective-C 2.0 总结（五）</a></h2>
       <p class="excerpt">内存管理[TOC]第 29 条：理解引用计数引用计数工作原理Objective-C 语言使用引用计数来管理内存，每个对象都有个可以递增递减的计数器，用以表示当前有多少个事物想令此对象继续存活下去。NSObject 协议声明下面三个方法用于操作计数器，以递增或递减其值：retain     递增保留计数release   递减保留计数autorelease 待稍后清理 “自动释放池” 时，再递减保留计数在调用release 之后，对象所占的内存可能会被回收，这样子在调用对象的方法就可能使程序...&hellip;</p>
       <div class="post-list__meta"><time datetime="2017-05-23 00:00:00 +0800" class="post-list__meta--date date">2017-05-23</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/05/Effective-Objective-C-2.0-five/>继续阅读</a></div>
@@ -182,27 +196,15 @@
       <hr class="post-list__divider" />
     </li>
     
-    <li>
-      <h2 class="post-list__post-title post-title"><a href="/2016/07/iOS_SigleCase/" title="访问 iOS单例模式">iOS单例模式</a></h2>
-      <p class="excerpt">单例 保证一个对象只实例化一次 全局使用的都是同一个对象一是某个类只能有一个实例；二是它必须自行创建这个实例；三是它必须自行向整个系统提供这个实例。第一种写法： +(instancetype)shareInstance{static PXYGuidePageHelper *instance;        @synchronized(self) {            if (instance == nil) {                instance = [PXYGuidePa...&hellip;</p>
-      <div class="post-list__meta"><time datetime="2016-07-28 00:00:00 +0800" class="post-list__meta--date date">2016-07-28</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/07/iOS_SigleCase/>继续阅读</a></div>
-      <hr class="post-list__divider" />
-    </li>
-    
-    <li>
-      <h2 class="post-list__post-title post-title"><a href="/2016/06/CodingStandardsForTeamDevelopment/" title="访问 关于团队开发的编码规范">关于团队开发的编码规范</a></h2>
-      <p class="excerpt">以下是均是个人看法，不喜勿喷，欢迎大家一起多多交流，共同进步。对于编码，每个人都有自己的习惯 ，但是我觉得要开发出优质代码的话有些规范还是要统一，毕竟你不是一个人做开发，你要考虑到团队协作以及后续人员维护你的项目，你想一下，让你维护一个别人的项目，上来就是ViewController几千行，所有页面逻辑全部在控制器里面，各种不能见名思义的变量属性，瞬间有种想死的感觉有木有😂😂😂所以吧，还是不要任性开发。说是对于团队开发的编码规范，其实在个人独立开发的时候也需要注意编码的问题，网上面有很多大...&hellip;</p>
-      <div class="post-list__meta"><time datetime="2016-06-13 00:00:00 +0800" class="post-list__meta--date date">2016-06-13</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2016/06/CodingStandardsForTeamDevelopment/>继续阅读</a></div>
-      <hr class="post-list__divider" />
-    </li>
-    
   </ol>
 
   <hr class="post-list__divider " />
 
 <nav class="pagination" role="navigation">
     
-    <span class="pagination__page-number">1 / 1</span>
+    <span class="pagination__page-number">1 / 2</span>
+    
+        <a class="older-posts pagination__older btn btn-small btn-tertiary" href="/page/2/#blog">更早 &rarr;</a>
     
 </nav>
 
@@ -212,7 +214,7 @@
             <section class="footer">
     <footer>
     	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
-        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-05-23 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-06-09 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
         <span class="footer__copyright">本站由 <a href="http://pengxuyuan.github.io">@彭序猿</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
     </footer>
 </section>

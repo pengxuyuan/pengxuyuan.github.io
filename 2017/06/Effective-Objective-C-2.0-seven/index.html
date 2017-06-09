@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Effective Objective-C 2.0 总结（七）</title>
+  <meta name="description" content="系统框架">
+  <meta name="author" content="Wei Wang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Effective Objective-C 2.0 总结（七）">
+  <meta name="twitter:description" content="系统框架">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Effective Objective-C 2.0 总结（七）">
+  <meta property="og:description" content="系统框架">
+
+  <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
+  <link href="/assets/images/favicon.png" rel="shortcut icon" type="image/png">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://pengxuyuan.github.io/2017/06/Effective-Objective-C-2.0-seven/">
+  <link rel="alternate" type="application/rss+xml" title="彭序猿" href="http://pengxuyuan.github.io/feed.xml">
+
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+  <!-- Hit Kounter -->
+  <script src="http://hitk.applinzi.com/scripts/dst/hit-kounter.js"></script>
+  <script src="https://cdn1.lncld.net/static/js/av-mini-0.6.10.js"></script>
+  <script src="http://jerry-cdn.b0.upaiyun.com/hit-kounter/hit-kounter-lc-0.2.0.js"></script>
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">
+        <i class="fa fa-list btn-mobile-menu__icon"></i>
+        <i class="fa fa-angle-up btn-mobile-close__icon hidden"></i>
+    </span>
+
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/assets/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+
+        <a href="/#blog" title="前往 彭序猿 的主页" class="blog-button"><img src="/assets/images/avatar.jpg" width="80" alt="彭序猿 logo" class="panel-cover__logo logo" /></a>
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 彭序猿" class="blog-button">彭序猿</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">耕读传家，学为好人</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">你好，我是彭序猿，目前在iOS开发的道路上探索，这里会写点关于iOS开发blog，还有一些生活上的琐碎事儿。</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        <p class="panel-cover__description">我们做技术的，不会耍什么心眼，从来都是你看我顺眼，我看你顺眼，那我们就是好基友～</p>
+        
+        
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="Visit blog" class="blog-button">博客</a></li>
+                
+              </ul>
+            </nav>
+          </div>
+          
+          <div><nav class="cover-navigation navigation--social">
+  <ul class="navigation">
+
+  
+  <!-- Weibo -->
+  <li class="navigation__item">
+    <a href="http://weibo.com/pengguang9412197045" title="@pengguang9412197045 的微博" target="_blank">
+      <i class='social fa fa-weibo'></i>
+      <span class="label">Weibo</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Github -->
+  <li class="navigation__item">
+    <a href="https://github.com/pengxuyuan" title="@pengxuyuan 的 Github" target="_blank">
+      <i class='social fa fa-github'></i>
+      <span class="label">Github</span>
+    </a>
+  </li>
+  
+
+  
+  <!-- Email -->
+  <li class="navigation__item">
+    <a href="mailto:451946155@qq.com" title="Contact me">
+      <i class='social fa fa-envelope'></i>
+      <span class="label">Email</span>
+    </a>
+  </li>
+  
+
+  </ul>
+</nav>
+</div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-slate"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <div class="post-meta">
+      <time datetime="2017-06-09 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2017-06-09</time> &#8226; <span class="post-meta__tags tags"></span>
+      <span class="post-meta__date date">浏览量：<span data-hk-page="current"> - </span> 次<span class="post-meta__date date"></span></span>
+    </div>
+    <h1 class="post-title">Effective Objective-C 2.0 总结（七）</h1>
+  </header>
+
+  <section class="post">
+    <h2>系统框架</h2>
+
+<h3>第 47 条：熟悉系统框架</h3>
+
+<ol>
+<li>框架：将一系列代码封装成动态库，并在其中放入描述其接口的头文件。平时我们第三方框架用的是静态库，因为iOS 应用程序不允许其中包含动态库。</li>
+<li>Foundation、CoreFoundation 框架平时用的比较多，“无缝桥接” 可以将这两种框架的对象平滑转换。</li>
+<li>还有很多系统库我们平时都应该尽量去用它们，而不是重新实现它们已经实现的功能：
+
+<ul>
+<li>CFNetwork</li>
+<li>CoreAudio</li>
+<li>AVFoundation</li>
+<li>CoreData</li>
+<li>CoreText</li>
+</ul></li>
+</ol>
+
+<blockquote>
+<ul>
+<li>许多系统框架都可以直接使用。其中最重要的是Foundation 与CoreFoundation，这两个框架提供了构建应用程序所需的许多核心功能。</li>
+<li>很多常见任务都能用框架来做，例如音频与视频处理、网络通信、数据管理等。</li>
+<li>请记住：用纯C 写成的框架与用Objective-C 写成的一样重要，若想成为优秀的Objective-C 开发者，应该掌握C 语音的核心概念。</li>
+</ul>
+</blockquote>
+
+<h3>第 48 条：多用块枚举，少用for 循环</h3>
+
+<p><strong>for 循环</strong></p>
+
+<p>简单粗暴，遍历数组还可以，但是对于遍历字典或者set，就不太友好。  </p>
+
+<p><strong>使用Objective-C 1.0 的NSEnumerator 来遍历</strong></p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">    NSArray *array = @[@&quot;A&quot;,@&quot;B&quot;,@&quot;C&quot;];
+    NSEnumerator *enumerator = [array objectEnumerator];
+    NSString *string;
+    while ((string = [enumerator nextObject]) != nil) {
+        NSLog(@&quot;%@&quot;,string);
+    }
+</code></pre></figure>
+<p>这种遍历使用相对比较统一，数组、字典和set 都可以这样子写，并且还有多种 “枚举器” 可供使用，例如反向遍历数组的枚举器。</p>
+
+<p><strong>快速遍历</strong></p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">    for (&lt;#type *object#&gt; in &lt;#collection#&gt;) {
+        &lt;#statements#&gt;
+    }
+</code></pre></figure>
+<p>for in  这个更加简洁，如果某个类的对象支持快速遍历，那么就可以宣称自己遵从名为NSFastEnumeration 的协议，从而令开发者可以采用此语法来迭代改对象。此协议只定义了一个方法：</p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained _Nullable [_Nonnull])buffer count:(NSUInteger)len;
+</code></pre></figure>
+<p>由于NSEnumerator 对象也实现了NSFastEnumeration 协议，所以能用来执行快速遍历。但是快速遍历拿不到当前操作对象的下标。</p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">    NSArray *array = @[@&quot;A&quot;,@&quot;B&quot;,@&quot;C&quot;];
+    for (NSString *string in [array reverseObjectEnumerator]) {
+        NSLog(@&quot;%@&quot;,string);
+    }   
+</code></pre></figure>
+<p><strong>基于块的遍历方式</strong></p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">    NSArray *array = @[@&quot;A&quot;,@&quot;B&quot;,@&quot;C&quot;];
+    [array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+
+    }];
+
+    [array enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+
+    }];
+</code></pre></figure>
+<p>此方式对于其他相比，在遍历时候可以直接在块中获取更多信息，而且这种对于字典的遍历也是非常友好的，一次性可以返回键和值。并且还可以支持反向遍历。</p>
+
+<blockquote>
+<ul>
+<li>遍历collection 有四种方式。最基本的办法就是for 循环，其次是NSEnumerator 遍历法及快速遍历法，最新、最先进的方式则是 “块枚举法”。</li>
+<li>“块枚举法” 本身就能通过GCD 来并发执行遍历操作，无须另行编写代码。而采用其他遍历则无法轻易实现这一点。</li>
+<li>若提前知道待遍历的collection 含有何种对象，则应修改块签名，指出对象的具体类型。</li>
+</ul>
+</blockquote>
+
+<h3>第 49 条：对自定义其内存管理语义的collection 使用无缝桥接</h3>
+
+<ol>
+<li><p>使用 “无缝桥接” 计数，可以在定义于Foundation 框架中的Objective-C 类和定义于CoreFoundation 框架中的C 数据结构之间相互转换。</p></li>
+<li><p>三种转换方式</p></li>
+</ol>
+
+<ul>
+<li>__bridge 只是声明类型转变，但是不做内存管理规则的转变</li>
+<li>__bridge_retained 表示将指针类型转变的同时，将内存管理的责任由原来的Objective-C 交给Core Foundation 来处理，也就是ARC 转变成 MRC</li>
+<li>__bridge_transfer 表示将管理的责任由Core Foundation 转交给Objective-C，即将MRC转变成ARC</li>
+</ul>
+
+<ol>
+<li>在Foundation 中字典对象：对其键的内存管理语义为 “拷贝”，而值的语义是 “保留”。只能通过强大的无缝桥接技术，否则无法改变其语义。</li>
+</ol>
+
+<p>CoreFoundation 框架的字典类型是CFDictionary，可变版本是CFMutableDictionary。</p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   //CFMutableDictionary 用CFDictionaryCreateMutable 来创建
+   //用CFDictionaryCreateMutable 定义
+   CFMutableDictionaryRef CFDictionaryCreateMutable (
+     CFAllocatorRef allocator, 
+     CFIndex capacity, 
+     const CFDictionaryKeyCallBacks *keyCallBacks, 
+     const CFDictionaryValueCallBacks *valueCallBacks
+   );
+
+   /*CFAllocatorRef 表示将要使用的内存分配器，CoreFoundation 对象里的数据结构需要占用内存，而分配器负责分配及回收这些内存，一般传NULL，表示采用默认的分配器。
+
+   CFIndex 表示字典的初始大小，跟我们Foundation 字典的创建一样，并不限制最大容量 就是预先分配内存
+
+   最后两个参数都是指向结构体的指针，定义了很多回调函数，用于指示字典中的键和值遇到各种事件时应该执行何种操作。
+
+   CFDictionaryKeyCallBacks 的结构体定义
+   typedef struct {
+       CFIndex              version;
+       CFDictionaryRetainCallBack       retain;
+       CFDictionaryReleaseCallBack      release;
+       CFDictionaryCopyDescriptionCallBack  copyDescription;
+       CFDictionaryEqualCallBack        equal;
+       CFDictionaryHashCallBack     hash;
+   } CFDictionaryKeyCallBacks;
+
+   CFDictionaryValueCallBacks 的结构体定义
+   typedef struct {
+       CFIndex              version;
+       CFDictionaryRetainCallBack       retain;
+       CFDictionaryReleaseCallBack      release;
+       CFDictionaryCopyDescriptionCallBack  copyDescription;
+       CFDictionaryEqualCallBack        equal;
+   } CFDictionaryValueCallBacks;
+
+   version 参数目前应设置为0，表示版本号；
+   其他参数都是函数指针，例如，字典加入了新的键与值，那么就会调用retain 函数，定义如下：
+   typedef const void *(*CFDictionaryRetainCallBack)(
+    CFAllocatorRef allocator, 
+    const void *value
+   );
+   retain 是个函数指针，其所指向的函数接受两个参数，其类型分别是CFAllocatorRef、const void *。传给此函数的value 参数表示即将加入字典中的键或值。而返回的void * 则表示加到字典里的最终值。我们可以这样子实现：
+   const void *CustomCallback（CFAllocatorRef allocator，const void *value）{
+    return value;
+   }
+   如果用它充当retain 回调函数来创建字典，那么该字典就不会 “保留” 键和值。然后再利用无缝桥接搭配起来，就可以创建特殊的NSDictionary 对象，跟我们普通的字典不一样。
+
+   开发者可以直接在CoreFoundation 层创建字典，于是就能修改内存管理语义，对键执行 “保留” 而非 “拷贝” 操作了。
+</code></pre></figure>
+<blockquote>
+<ul>
+<li>通过无缝桥接技术，可以在Foundation 框架中的Objective-C 对象与CoreFoundation 框架中的C 语言数据结构之间来回转换。</li>
+<li>在CoreFoundation 层面创建collection 时，可以指定许多回调函数，这些函数表示此collection 应如何处理其元素。然后，可运用无缝桥接技术，将其转换成具备特殊内存管理语义的Objective-C collection。</li>
+</ul>
+</blockquote>
+
+<h3>第 50 条：构建缓存时选用 NSCache 而非 NSDictionay</h3>
+
+<ol>
+<li>NSCache 是专门来处理缓存的，在系统资源将要耗尽时，它可以自动删减缓存。</li>
+<li>NScahe 并不会 “拷贝” 键，而是会 “保留” 它。NScahe 键很多时候都是由不支持拷贝操作对象充当的。NSCache 是线程安全的，不用编写加锁代码，多个线程便可以同时访问NSCache。</li>
+<li>NSPurgeableData 类是NSMutableData 的子类，而且实现了NSDiscardableContent 协议。如果对象所占的内存能够根据需要随时丢弃，那么久可以实现该协议所定义的接口。当系统资源紧张时，可以把保存NSPurgeableData 对象那块内存释放掉。</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>实现缓存时应选用NSCache 而非NSDictionary 对象。因为NSCache 可以提供优雅的自动删减功能，而且是线程安全的，此外，它与字典不同，并不会拷贝健。</li>
+<li>可以给NSCache 对象设置上限，用以限制缓存中的对象总个数及总成本，而这些尺度则定义了缓存删减其中对象的时机。但是绝对不要把这些尺度当成可靠的 “硬限制”，它们仅对NSCache 其指导作用。</li>
+<li>将NSPurgeableData 与 NSCache 搭配使用，可实现自动清除数据的功能，也就是说，当NSPurgeableData 对象所占内存为系统丢弃时，该对象也会从缓存中移除。</li>
+<li>如果缓存使用得当，那么应用程序的响应速度就能提高。只有那种 “ 重新计算起来很费事的” 数据，才值得放入缓存，比如那些需要从网络获取或从磁盘读取的数据。</li>
+</ul>
+</blockquote>
+
+<h3>第 51 条：精简 initalize 与 load 的实现代码</h3>
+
+<ol>
+<li>对于加入运行期系统中的每个类及分类，必定会调用load 这个方法，而且仅调用一次。意思就是程序启动的时候需要加载load 方法，这个时候运行期系统也是出于 “脆弱状态”，在执行子类的load 方法之前，必定会先执行所有超类的load 方法。</li>
+<li>如果load 代码还依赖了其他类，那类的load 也必然会先执行，我们无法判断每个类的载入顺序，所以load 方法使用其他类是不安全的。</li>
+<li>load 方法不遵从继承规则，如果某个类没实现load 方法，那么不管其各级超类是否实现此方法，系统都不会调用。</li>
+<li>load 方法要实现的精简点，因为应用程序在执行load 方法会阻塞。load 一般作为调试用，很少用来做初始化操作。</li>
+<li>想执行与类相关的初始化操作，可以使用 <code>+(void)initialize</code>  这个方法，它跟load 有以下几个区别：
+
+<ul>
+<li>这个方法是在首次使用这个类的时候调用，类似 “惰性调用” ，只有用到这个类才会调用。</li>
+<li>运行期在执行该方法的时候，是出于正常状态的，此时是可以安全调用任意类的任意方法，而且运行期系统会确保initialize 方法一定在 “线程安全的环境” 中执行。其他线程都要先阻塞，等initialize 执行完。</li>
+<li>initialize 方法跟其他方法一样，某个类没有实现它，而超类方法实现了，那么就会运行超类的实现代码。</li>
+</ul></li>
+<li>也就是说initalize 与 load 的实现代码要精简些。</li>
+<li>若某个全局状态无法在编译期初始化，则可以放在initalize 里来做。（例如Objectice-C 对象，创建实例之前必须先激活运行期系统）</li>
+</ol>
+
+<blockquote>
+<ul>
+<li>在加载阶段，如果类实现了load 方法，那么系统就会调用它。分类里也可以定义此方法，类的load 方法要比分类中的先调用。与其他方法不同，load 方法不参与覆写机制。</li>
+<li>首次使用某个类之前，系统会向其发送initialize 消息。由于此方法遵从普通的覆写规则，所以通常应该在里面判断当前要初始化的哪个类。</li>
+<li>load 与initialize 方法都应该实现得精简一些，这有助于保持应用程序的响应能力，也能减少引入 “依赖环” 的几率。</li>
+<li>无法在编译器设定的全局变量，可以放在initialize 方法里初始化。</li>
+</ul>
+</blockquote>
+
+<h3>第 52 条：别忘了NSTimer 会保留其目标对象</h3>
+
+<ol>
+<li><p>计时器放在运行循环里，它才能正常触发任务。</p></li>
+<li><figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c"></code></pre></figure>
+<ul>
+<li>scheduledTimerWithTimeInterval:target:selector:userInfo:repeats:
+```</li>
+</ul></li>
+</ol>
+
+<p>计时器会保留其目标对象，等到自身 “失效” 时再释放此对象，调用invalidate 方法可令计时器失效；设置成重复执行模式的计时器，要注意 “保留环” 问题。</p>
+
+<ol>
+<li>如何解决外界不调用invalidate 方法也不产生 “保留环” 的问题。</li>
+</ol>
+
+<p>可以用块来解决这个问题，其实就是将timer 的target 对象不要指向持有timer 的对象，这里用的方法是让timer 的taerget 指向自己。</p>
+<figure class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">   //定义
+   + (NSTimer *)my_scheduledTimerWithTimeInterval:(NSTimeInterval)ti
+                                            block:(void(^)())block
+                                          repeats:(BOOL)yesOrNo;
+
+   //实现
+   + (NSTimer *)my_scheduledTimerWithTimeInterval:(NSTimeInterval)ti
+                                            block:(void(^)())block
+                                          repeats:(BOOL)yesOrNo {
+       return [self scheduledTimerWithTimeInterval:ti
+                                            target:self
+                                          selector:@selector(my_blockInvoke:)
+                                          userInfo:[block copy]
+                                           repeats:yesOrNo];
+   }
+
+   - (void)my_blockInvoke:(NSTimer *)timer {
+       void (^block) () = timer.userInfo;
+       if (block) {
+           block();
+       }
+   }
+</code></pre></figure>
+<blockquote>
+<ul>
+<li>NSTimer 对象会保留其目标，直到计时器本身失效为止，调用invalidate 方法可令计时器实效，另外，一次性的计时器在触发完任务之后也会失效。</li>
+<li>反复执行任务的计时器，很容易引入保留环，如果这种计时器的目标对象又保留了计时器本身，那肯定会导致保留环。这种环状保留关系，可能是直接发生的，也可能是通过对象图里的其他对象间接发生的。</li>
+<li>可以扩充NSTimer 的功能，用 “块” 来打破保留环。不过，除非NSTimer 将来在公共接口里提供此功能，否则必须创建分类，将相关实现代码加入其中。</li>
+</ul>
+</blockquote>
+
+  </section>
+</article>
+
+<section class="read-more">
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">最近的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/06/Effective-Objective-C-2.0-six/" title="link to Effective Objective-C 2.0 总结（六）">Effective Objective-C 2.0 总结（六）</a></h2>
+       <p class="excerpt">块与大中枢派发第 37 条：理解 “块” 这一概念块可以实现闭包。块的基础知识块用 “” 符号来表示，后面跟着一对花括号，括号里面是块的实现代码。块其实就是个值，而且自有其相关类型，可以赋值给变量；块类型的语法和函数指针类似。   ^{    //block implementation herer       }   //这里定义了名为someBlock 的变量   //块类型的语法结构如下   //return_type (^block_name)(parameters)   void...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-06-09 00:00:00 +0800" class="post-list__meta--date date">2017-06-09</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/06/Effective-Objective-C-2.0-six/>继续阅读</a></div>
+   </div>
+   
+   
+   
+   
+   <div class="read-more-item">
+       <span class="read-more-item-dim">更早的文章</span>
+       <h2 class="post-list__post-title post-title"><a href="/2017/05/Effective-Objective-C-2.0-five/" title="link to Effective Objective-C 2.0 总结（五）">Effective Objective-C 2.0 总结（五）</a></h2>
+       <p class="excerpt">内存管理[TOC]第 29 条：理解引用计数引用计数工作原理Objective-C 语言使用引用计数来管理内存，每个对象都有个可以递增递减的计数器，用以表示当前有多少个事物想令此对象继续存活下去。NSObject 协议声明下面三个方法用于操作计数器，以递增或递减其值：retain     递增保留计数release   递减保留计数autorelease 待稍后清理 “自动释放池” 时，再递减保留计数在调用release 之后，对象所占的内存可能会被回收，这样子在调用对象的方法就可能使程序...&hellip;</p>
+       <div class="post-list__meta"><time datetime="2017-05-23 00:00:00 +0800" class="post-list__meta--date date">2017-05-23</time> &#8226; <span class="post-list__meta--tags tags"></span><a class="btn-border-small" href=/2017/05/Effective-Objective-C-2.0-five/>继续阅读</a></div>
+   </div>
+   
+</section>
+
+<section class="post-comments">
+  
+    <div class="ds-thread" data-thread-key="/2017/06/Effective-Objective-C-2.0-seven/" data-title="Effective Objective-C 2.0 总结（七）" data-url="http://pengxuyuan.github.io/2017/06/Effective-Objective-C-2.0-seven/"></div>
+    <script type="text/javascript">
+        var duoshuoQuery = {short_name:"pengxuyuan"};
+        (function() {
+            var ds = document.createElement('script');
+            ds.type = 'text/javascript';ds.async = true;
+            ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+            ds.charset = 'UTF-8';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+    </script>
+  
+  
+  
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+    	<span class="footer__copyright">本站点采用<a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a></span>
+        <span class="footer__copyright">由 <a href="https://jekyllrb.com">Jekyll</a> 于 2017-06-09 生成，感谢 <a href="https://www.digitalocean.com/?refcode=30ed2d146762">Digital Ocean</a> 为本站提供稳定的 VPS 服务</span>
+        <span class="footer__copyright">本站由 <a href="http://pengxuyuan.github.io">@彭序猿</a> 创建，采用 <a href="https://github.com/onevcat/vno-jekyll">Vno - Jekyll</a> 作为主题，您可以在 GitHub 找到<a href="https://github.com/onevcat/OneV-s-Den">本站源码</a> - &copy; 2017</span>
+    </footer>
+</section>
+
+        </div>
+    </div>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script type="text/javascript" src="/js/main.js"></script>
+
+
+
+
+  </body>
+
+</html>
